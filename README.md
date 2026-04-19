@@ -1,4 +1,4 @@
-# 八大排序算法可视化系统的设计与实现   https://zhaihuijuan.github.io/8-Sorting-Algorithm-Visualization-Step-by-Step-Teaching-System/
+# 八大排序算法可视化教学系统的设计与实现   https://zhaihuijuan.github.io/8-Sorting-Algorithm-Visualization-Step-by-Step-Teaching-System/
 
 ## 摘要
 
