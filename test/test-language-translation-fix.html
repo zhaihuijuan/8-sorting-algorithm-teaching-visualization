@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Translation Fix Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            border-left: 4px solid #4a9eff;
+        }
+        
+        .test-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
+        }
+        
+        .status {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status.pass {
+            background: #28a745;
+            color: white;
+        }
+        
+        .status.fail {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .legend-items {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: #b0b0b0;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: linear-gradient(135deg, #87ceeb 0%, #5dade2 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Language Translation Fix Test</h1>
+        <p>Testing the fix for "颜色含义" and "指针位置" translation issues.</p>
+        
+        <div class="test-section">
+            <h2>Language Control</h2>
+            <button id="language-toggle" class="btn">
+                <span>🌐</span>
+                <span id="language-text">中文</span>
+            </button>
+            <p>Current Language: <span id="current-lang">zh</span></p>
+        </div>
+        
+        <div class="test-section">
+            <h2>Translation Test Items</h2>
+            
+            <div class="test-item">
+                <span>Display Mode Label:</span>
+                <label for="display-mode" data-translate="displayModeLabel">显示模式:</label>
+                <span id="display-mode-status" class="status">Testing...</span>
+            </div>
+            
+            <div class="test-item">
+                <span>Color Legend Title:</span>
+                <label data-translate="colorLegend.title">颜色含义:</label>
+                <span id="color-legend-status" class="status">Testing...</span>
+            </div>
+            
+            <div class="test-item">
+                <span>Pointer Position Label:</span>
+                <strong data-translate="stats.pointerPosition">指针位置:</strong>
+                <span id="pointer-position-status" class="status">Testing...</span>
+            </div>
+            
+            <div class="test-item">
+                <span>Page Title:</span>
+                <span id="page-title">八大排序算法可视化</span>
+                <span id="page-title-status" class="status">Testing...</span>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Color Legend Test</h2>
+            <div class="control-group color-legend">
+                <label data-translate="colorLegend.title">颜色含义:</label>
+                <div class="legend-items">
+                    <div class="legend-item">
+                        <div class="legend-color"></div>
+                        <span>待排</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color"></div>
+                        <span>比较</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color"></div>
+                        <span>完成</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Pointer Position Test</h2>
+            <div id="pointers-info">
+                <p><strong data-translate="stats.pointerPosition">指针位置:</strong></p>
+                <div id="pointer-values">
+                    <div style="display: inline-block; margin: 2px 8px; padding: 2px 8px; background: rgba(74, 158, 255, 0.2); border-radius: 4px; font-size: 12px;">
+                        i: 5
+                    </div>
+                    <div style="display: inline-block; margin: 2px 8px; padding: 2px 8px; background: rgba(74, 158, 255, 0.2); border-radius: 4px; font-size: 12px;">
+                        j: 10
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Test Results</h2>
+            <div id="test-results">
+                <p>Click the language toggle button to test translations...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="language-manager.js"></script>
+    <script>
+        // Test script
+        let testResults = {
+            displayMode: false,
+            colorLegend: false,
+            pointerPosition: false,
+            pageTitle: false
+        };
+        
+        function updateTestStatus() {
+            const currentLang = window.languageManager.getCurrentLanguage();
+            document.getElementById('current-lang').textContent = currentLang;
+            
+            // Test display mode label
+            const displayModeLabel = document.querySelector('label[data-translate="displayModeLabel"]');
+            const expectedDisplayMode = currentLang === 'zh' ? '显示模式:' : 'Display Mode:';
+            testResults.displayMode = displayModeLabel && displayModeLabel.textContent === expectedDisplayMode;
+            document.getElementById('display-mode-status').textContent = testResults.displayMode ? 'PASS' : 'FAIL';
+            document.getElementById('display-mode-status').className = 'status ' + (testResults.displayMode ? 'pass' : 'fail');
+            
+            // Test color legend title
+            const colorLegendLabels = document.querySelectorAll('label[data-translate="colorLegend.title"]');
+            const expectedColorLegend = currentLang === 'zh' ? '颜色含义:' : 'Color Legend:';
+            testResults.colorLegend = colorLegendLabels.length > 0 && Array.from(colorLegendLabels).every(label => label.textContent === expectedColorLegend);
+            document.getElementById('color-legend-status').textContent = testResults.colorLegend ? 'PASS' : 'FAIL';
+            document.getElementById('color-legend-status').className = 'status ' + (testResults.colorLegend ? 'pass' : 'fail');
+            
+            // Test pointer position label
+            const pointerPositionLabel = document.querySelector('strong[data-translate="stats.pointerPosition"]');
+            const expectedPointerPosition = currentLang === 'zh' ? '指针位置:' : 'Pointer Position:';
+            testResults.pointerPosition = pointerPositionLabel && pointerPositionLabel.textContent === expectedPointerPosition;
+            document.getElementById('pointer-position-status').textContent = testResults.pointerPosition ? 'PASS' : 'FAIL';
+            document.getElementById('pointer-position-status').className = 'status ' + (testResults.pointerPosition ? 'pass' : 'fail');
+            
+            // Test page title
+            const pageTitle = document.getElementById('page-title');
+            const expectedPageTitle = currentLang === 'zh' ? '八大排序算法可视化' : 'Eight Sorting Algorithms Visualization';
+            testResults.pageTitle = pageTitle && pageTitle.textContent === expectedPageTitle;
+            document.getElementById('page-title-status').textContent = testResults.pageTitle ? 'PASS' : 'FAIL';
+            document.getElementById('page-title-status').className = 'status ' + (testResults.pageTitle ? 'pass' : 'fail');
+            
+            // Update overall results
+            const passCount = Object.values(testResults).filter(result => result).length;
+            const totalCount = Object.keys(testResults).length;
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = `
+                <p><strong>Test Results: ${passCount}/${totalCount} tests passed</strong></p>
+                <ul>
+                    <li>Display Mode Label: ${testResults.displayMode ? '✅ PASS' : '❌ FAIL'}</li>
+                    <li>Color Legend Title: ${testResults.colorLegend ? '✅ PASS' : '❌ FAIL'}</li>
+                    <li>Pointer Position Label: ${testResults.pointerPosition ? '✅ PASS' : '❌ FAIL'}</li>
+                    <li>Page Title: ${testResults.pageTitle ? '✅ PASS' : '❌ FAIL'}</li>
+                </ul>
+                ${passCount === totalCount ? '<p style="color: #28a745; font-weight: bold;">🎉 All tests passed! Translation fix is working correctly.</p>' : '<p style="color: #dc3545; font-weight: bold;">⚠️ Some tests failed. Translation fix needs more work.</p>'}
+            `;
+        }
+        
+        // Listen for language changes
+        document.addEventListener('languageChanged', () => {
+            console.log('Language changed, updating test status...');
+            setTimeout(updateTestStatus, 100); // Small delay to ensure all updates are complete
+        });
+        
+        // Initial test
+        setTimeout(() => {
+            updateTestStatus();
+            
+            // Also update page title manually for testing
+            const pageTitle = document.getElementById('page-title');
+            if (pageTitle && window.languageManager) {
+                pageTitle.textContent = window.languageManager.getText('pageTitle');
+            }
+        }, 500);
+    </script>
+</body>
+</html>

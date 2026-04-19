@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>详细步骤说明测试</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #ffffff;
+            padding: 20px;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+        }
+        
+        .step-display {
+            background: rgba(74, 158, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #4a9eff;
+            margin: 10px 0;
+            min-height: 50px;
+        }
+        
+        .highlight-value {
+            background: rgba(74, 158, 255, 0.3);
+            color: #4a9eff;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        .highlight-index {
+            background: rgba(255, 193, 7, 0.3);
+            color: #ffc107;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        .highlight-range {
+            background: rgba(40, 167, 69, 0.3);
+            color: #28a745;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        .highlight-round {
+            background: rgba(220, 53, 69, 0.3);
+            color: #dc3545;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
+        }
+        
+        .language-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <button class="language-toggle" onclick="toggleLanguage()">切换语言</button>
+    
+    <div class="test-container">
+        <h1>详细步骤说明测试</h1>
+        <p>测试各种排序算法的详细步骤说明功能</p>
+        
+        <div class="test-section">
+            <h2>比较操作测试</h2>
+            <button onclick="testComparing()">测试比较操作</button>
+            <div id="comparing-display" class="step-display"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>交换操作测试</h2>
+            <button onclick="testSwapping()">测试交换操作</button>
+            <div id="swapping-display" class="step-display"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>插入操作测试</h2>
+            <button onclick="testInsertion()">测试插入操作</button>
+            <div id="insertion-display" class="step-display"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>分区操作测试</h2>
+            <button onclick="testPartitioning()">测试分区操作</button>
+            <div id="partitioning-display" class="step-display"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>合并操作测试</h2>
+            <button onclick="testMerging()">测试合并操作</button>
+            <div id="merging-display" class="step-display"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>堆化操作测试</h2>
+            <button onclick="testHeapifying()">测试堆化操作</button>
+            <div id="heapifying-display" class="step-display"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>轮次完成测试</h2>
+            <button onclick="testRoundComplete()">测试轮次完成</button>
+            <div id="round-display" class="step-display"></div>
+        </div>
+    </div>
+
+    <script src="language-manager.js"></script>
+    <script>
+        let currentLanguage = 'zh';
+        
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'zh' ? 'en' : 'zh';
+            window.languageManager.setLanguage(currentLanguage);
+            document.querySelector('.language-toggle').textContent = 
+                currentLanguage === 'zh' ? '切换语言' : 'Switch Language';
+        }
+        
+        function testComparing() {
+            const description = window.languageManager.getDetailedStepDescription('comparing_positions', {
+                value1: 45,
+                value2: 23,
+                pos1: 3,
+                pos2: 7
+            });
+            document.getElementById('comparing-display').innerHTML = description;
+        }
+        
+        function testSwapping() {
+            const description = window.languageManager.getDetailedStepDescription('swapping_values', {
+                value1: 90,
+                value2: 18,
+                pos1: 2,
+                pos2: 5
+            });
+            document.getElementById('swapping-display').innerHTML = description;
+        }
+        
+        function testInsertion() {
+            const description = window.languageManager.getDetailedStepDescription('extracting_for_insertion', {
+                index: 4,
+                value: 32
+            });
+            document.getElementById('insertion-display').innerHTML = description;
+        }
+        
+        function testPartitioning() {
+            const description = window.languageManager.getDetailedStepDescription('selecting_pivot', {
+                pivot: 67
+            });
+            document.getElementById('partitioning-display').innerHTML = description;
+        }
+        
+        function testMerging() {
+            const description = window.languageManager.getDetailedStepDescription('merging_ranges', {
+                left: 0,
+                mid: 3,
+                mid1: 4,
+                right: 7
+            });
+            document.getElementById('merging-display').innerHTML = description;
+        }
+        
+        function testHeapifying() {
+            const description = window.languageManager.getDetailedStepDescription('heapify_structure', {
+                parentValue: 85
+            });
+            document.getElementById('heapifying-display').innerHTML = description;
+        }
+        
+        function testRoundComplete() {
+            const description = window.languageManager.getDetailedStepDescription('round_complete', {
+                round: 3,
+                value: 95
+            });
+            document.getElementById('round-display').innerHTML = description;
+        }
+        
+        // 初始化测试
+        window.addEventListener('DOMContentLoaded', () => {
+            testComparing();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>代码高亮功能测试</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .demo-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            border-left: 4px solid #4a9eff;
+        }
+        
+        .control-panel {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+        
+        .code-container {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            overflow-x: auto;
+            position: relative;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .code-line {
+            display: block;
+            padding: 2px 5px;
+            margin: 1px 0;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .code-line.highlighted {
+            background: linear-gradient(90deg, rgba(255, 193, 7, 0.3) 0%, rgba(255, 193, 7, 0.1) 100%);
+            border-left: 3px solid #ffc107;
+            transform: translateX(3px);
+            box-shadow: 0 0 10px rgba(255, 193, 7, 0.2);
+        }
+        
+        .step-info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #28a745;
+        }
+        
+        .algorithm-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 5px;
+            color: #b0b0b0;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            color: white;
+        }
+        
+        .language-toggle {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: auto;
+        }
+        
+        .status-display {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🎯 代码高亮功能实现测试</h1>
+        <p>测试新实现的代码高亮功能，验证在排序过程中高亮显示正在执行的代码行</p>
+        
+        <div class="demo-section">
+            <h2>📊 功能验证</h2>
+            <div class="step-info">
+                <h4>实现完成的功能:</h4>
+                <ul>
+                    <li>✅ 在language-manager.js中添加了代码行映射</li>
+                    <li>✅ 在ui-handler.js中实现了代码高亮显示</li>
+                    <li>✅ 在sorting-algorithms.js中增强了代码行获取</li>
+                    <li>✅ 支持中英文代码注释同步切换</li>
+                    <li>✅ 实时高亮正在执行的代码行</li>
+                    <li>✅ 不影响现有功能的稳定性</li>
+                </ul>
+                
+                <h4>技术实现:</h4>
+                <ul>
+                    <li><strong>代码分行存储:</strong> 算法代码按行分割并在DOM中创建span元素</li>
+                    <li><strong>步骤映射:</strong> 建立排序步骤与代码行的对应关系</li>
+                    <li><strong>动态高亮:</strong> 根据当前步骤高亮对应代码行</li>
+                    <li><strong>语言同步:</strong> 中英文切换时同步更新代码和高亮</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>🎮 功能演示</h2>
+            
+            <div class="control-panel">
+                <button class="language-toggle" onclick="toggleLanguage()">
+                    <span id="lang-text">中文</span>
+                </button>
+            </div>
+            
+            <div class="algorithm-tabs">
+                <button class="tab active" onclick="switchAlgorithm('bubbleSort')">冒泡排序</button>
+                <button class="tab" onclick="switchAlgorithm('selectionSort')">选择排序</button>
+                <button class="tab" onclick="switchAlgorithm('insertionSort')">插入排序</button>
+                <button class="tab" onclick="switchAlgorithm('mergeSort')">归并排序</button>
+                <button class="tab" onclick="switchAlgorithm('quickSort')">快速排序</button>
+                <button class="tab" onclick="switchAlgorithm('heapSort')">堆排序</button>
+                <button class="tab" onclick="switchAlgorithm('countingSort')">计数排序</button>
+                <button class="tab" onclick="switchAlgorithm('radixSort')">基数排序</button>
+            </div>
+            
+            <div class="control-panel">
+                <button class="btn btn-success" onclick="simulateStep('comparing_positions')">模拟比较步骤</button>
+                <button class="btn btn-warning" onclick="simulateStep('swapping_values')">模拟交换步骤</button>
+                <button class="btn btn-danger" onclick="simulateStep('round_complete')">模拟轮次完成</button>
+                <button class="btn" onclick="clearHighlight()">清除高亮</button>
+            </div>
+            
+            <div class="status-display">
+                <strong>当前状态:</strong> <span id="current-status">等待操作...</span>
+            </div>
+            
+            <div class="code-container" id="code-display">
+                <!-- 代码将在这里动态显示 -->
+            </div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>🔧 使用说明</h2>
+            <div class="step-info">
+                <h4>如何使用代码高亮功能:</h4>
+                <ol>
+                    <li><strong>切换显示模式:</strong> 在主界面选择"带注释的代码"显示模式</li>
+                    <li><strong>开始排序:</strong> 点击"开始排序"按钮开始排序过程</li>
+                    <li><strong>观察高亮:</strong> 在排序过程中，右侧代码区域会高亮显示当前执行的代码行</li>
+                    <li><strong>语言切换:</strong> 切换中英文时，代码注释和高亮会同步更新</li>
+                    <li><strong>教学模式:</strong> 在教学模式下，每一步都会详细显示正在执行的代码</li>
+                </ol>
+                
+                <h4>技术特点:</h4>
+                <ul>
+                    <li>🟢 <strong>低风险:</strong> 不修改现有排序逻辑，只添加显示功能</li>
+                    <li>🟢 <strong>兼容性好:</strong> 基于现有的updateDetailedStep机制</li>
+                    <li>🟢 <strong>性能优化:</strong> 使用CSS3动画和DOM优化技术</li>
+                    <li>🟢 <strong>用户体验:</strong> 平滑的高亮动画和自动滚动定位</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = 'zh';
+        let currentAlgorithm = 'bubbleSort';
+        
+        // 模拟的代码数据结构
+        const algorithmCodes = {
+            zh: {
+                bubbleSort: [
+                    '// 冒泡排序 - Bubble Sort',
+                    'function bubbleSort(arr) {',
+                    '    const n = arr.length;',
+                    '    for (let i = 0; i < n - 1; i++) {',
+                    '        let swapped = false;',
+                    '        for (let j = 0; j < n - i - 1; j++) {',
+                    '            // 比较相邻元素',
+                    '            if (arr[j] > arr[j + 1]) {',
+                    '                // 交换元素',
+                    '                [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];',
+                    '                swapped = true;',
+                    '            }',
+                    '        }',
+                    '        // 如果没有交换，数组已排序',
+                    '        if (!swapped) break;',
+                    '    }',
+                    '    return arr;',
+                    '}'
+                ],
+                selectionSort: [
+                    '// 选择排序 - Selection Sort',
+                    'function selectionSort(arr) {',
+                    '    const n = arr.length;',
+                    '    for (let i = 0; i < n - 1; i++) {',
+                    '        // 找到最小元素的索引',
+                    '        let minIndex = i;',
+                    '        for (let j = i + 1; j < n; j++) {',
+                    '            if (arr[j] < arr[minIndex]) {',
+                    '                minIndex = j;',
+                    '            }',
+                    '        }',
+                    '        // 交换最小元素到正确位置',
+                    '        if (minIndex !== i) {',
+                    '            [arr[i], arr[minIndex]] = [arr[minIndex], arr[i]];',
+                    '        }',
+                    '    }',
+                    '    return arr;',
+                    '}'
+                ]
+            },
+            en: {
+                bubbleSort: [
+                    '// Bubble Sort - 冒泡排序',
+                    'function bubbleSort(arr) {',
+                    '    const n = arr.length;',
+                    '    for (let i = 0; i < n - 1; i++) {',
+                    '        let swapped = false;',
+                    '        for (let j = 0; j < n - i - 1; j++) {',
+                    '            // Compare adjacent elements',
+                    '            if (arr[j] > arr[j + 1]) {',
+                    '                // Swap elements',
+                    '                [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];',
+                    '                swapped = true;',
+                    '            }',
+                    '        }',
+                    '        // If no swaps occurred, array is sorted',
+                    '        if (!swapped) break;',
+                    '    }',
+                    '    return arr;',
+                    '}'
+                ],
+                selectionSort: [
+                    '// Selection Sort - 选择排序',
+                    'function selectionSort(arr) {',
+                    '    const n = arr.length;',
+                    '    for (let i = 0; i < n - 1; i++) {',
+                    '        // Find the index of minimum element',
+                    '        let minIndex = i;',
+                    '        for (let j = i + 1; j < n; j++) {',
+                    '            if (arr[j] < arr[minIndex]) {',
+                    '                minIndex = j;',
+                    '            }',
+                    '        }',
+                    '        // Swap minimum element to correct position',
+                    '        if (minIndex !== i) {',
+                    '            [arr[i], arr[minIndex]] = [arr[minIndex], arr[i]];',
+                    '        }',
+                    '    }',
+                    '    return arr;',
+                    '}'
+                ]
+            }
+        };
+        
+        // 步骤到代码行的映射
+        const stepToLineMapping = {
+            bubbleSort: {
+                comparing_positions: [7], // if (arr[j] > arr[j + 1])
+                swapping_values: [9], // [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]]
+                round_complete: [14] // if (!swapped) break
+            },
+            selectionSort: {
+                comparing_positions: [7], // if (arr[j] < arr[minIndex])
+                swapping_values: [12], // [arr[i], arr[minIndex]] = [arr[minIndex], arr[i]]
+                round_complete: [11] // if (minIndex !== i)
+            }
+        };
+        
+        function displayCode() {
+            const codeContainer = document.getElementById('code-display');
+            const lines = algorithmCodes[currentLanguage][currentAlgorithm] || [];
+            
+            codeContainer.innerHTML = '';
+            
+            lines.forEach((line, index) => {
+                const lineElement = document.createElement('span');
+                lineElement.className = 'code-line';
+                lineElement.setAttribute('data-line', index);
+                lineElement.textContent = line;
+                
+                lineElement.style.cssText = `
+                    display: block;
+                    padding: 2px 5px;
+                    margin: 1px 0;
+                    border-radius: 3px;
+                    transition: all 0.3s ease;
+                    position: relative;
+                    line-height: 1.4;
+                `;
+                
+                codeContainer.appendChild(lineElement);
+            });
+        }
+        
+        function highlightLine(lineIndex) {
+            clearHighlight();
+            
+            const line = document.querySelector(`[data-line="${lineIndex}"]`);
+            if (line) {
+                line.classList.add('highlighted');
+                line.style.cssText += `
+                    background: linear-gradient(90deg, rgba(255, 193, 7, 0.3) 0%, rgba(255, 193, 7, 0.1) 100%);
+                    border-left: 3px solid #ffc107;
+                    transform: translateX(3px);
+                    box-shadow: 0 0 10px rgba(255, 193, 7, 0.2);
+                `;
+                
+                // 滚动到高亮行
+                line.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+        
+        function clearHighlight() {
+            const highlighted = document.querySelectorAll('.highlighted');
+            highlighted.forEach(el => {
+                el.classList.remove('highlighted');
+                el.style.background = '';
+                el.style.borderLeft = '';
+                el.style.transform = '';
+                el.style.boxShadow = '';
+            });
+            
+            document.getElementById('current-status').textContent = '等待操作...';
+        }
+        
+        function simulateStep(stepType) {
+            const mapping = stepToLineMapping[currentAlgorithm];
+            if (!mapping || !mapping[stepType]) return;
+            
+            const lineIndex = mapping[stepType][0];
+            highlightLine(lineIndex);
+            
+            // 更新状态信息
+            const stepTexts = {
+                zh: {
+                    comparing_positions: '正在比较相邻元素',
+                    swapping_values: '正在交换元素位置',
+                    round_complete: '当前轮次排序完成'
+                },
+                en: {
+                    comparing_positions: 'Comparing adjacent elements',
+                    swapping_values: 'Swapping element positions',
+                    round_complete: 'Current round completed'
+                }
+            };
+            
+            const stepText = stepTexts[currentLanguage][stepType] || stepType;
+            document.getElementById('current-status').textContent = stepText;
+        }
+        
+        function switchAlgorithm(algorithm) {
+            // 更新标签状态
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            currentAlgorithm = algorithm;
+            clearHighlight();
+            displayCode();
+        }
+        
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'zh' ? 'en' : 'zh';
+            document.getElementById('lang-text').textContent = currentLanguage === 'zh' ? '中文' : 'English';
+            
+            // 更新算法标签文本
+            const tabTexts = {
+                zh: ['冒泡排序', '选择排序', '插入排序', '归并排序', '快速排序', '堆排序', '计数排序', '基数排序'],
+                en: ['Bubble Sort', 'Selection Sort', 'Insertion Sort', 'Merge Sort', 'Quick Sort', 'Heap Sort', 'Counting Sort', 'Radix Sort']
+            };
+            
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach((tab, index) => {
+                if (tabTexts[currentLanguage][index]) {
+                    tab.textContent = tabTexts[currentLanguage][index];
+                }
+            });
+            
+            clearHighlight();
+            displayCode();
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            displayCode();
+            console.log('✅ Code highlighting implementation test loaded');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speed Unit and Language Position Fix Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .control-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            border-left: 4px solid #4a9eff;
+        }
+        
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-group label {
+            font-size: 14px;
+            color: #b0b0b0;
+            min-width: 80px;
+        }
+        
+        /* 语言切换按钮固定位置样式 */
+        .language-toggle-fixed {
+            margin-left: auto !important;
+            flex-shrink: 0;
+        }
+        
+        select, input[type="range"] {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #ffffff;
+            padding: 8px 12px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #4a9eff;
+            box-shadow: 0 0 10px rgba(74, 158, 255, 0.3);
+        }
+
+        select option {
+            background: #1a1a2e;
+            color: #ffffff;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 10px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(74, 158, 255, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+        }
+        
+        .test-results {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #28a745;
+        }
+        
+        .highlight {
+            background: rgba(255, 193, 7, 0.2);
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #ffc107;
+            font-weight: bold;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1000;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔧 Speed Unit and Language Position Fix Test</h1>
+        <p>测试速度单位显示和语言切换按钮位置修复</p>
+        
+        <div class="control-section">
+            <h2>📊 修复内容对比</h2>
+            <div class="test-results">
+                <h4>修复项目 1: 速度单位显示</h4>
+                <ul>
+                    <li><strong>修改前:</strong> 50ms</li>
+                    <li><strong>修改后:</strong> <span class="highlight">50ms(柱体移动一次耗时)</span></li>
+                    <li><strong>说明:</strong> 更清楚地说明了速度参数的含义</li>
+                </ul>
+                
+                <h4>修复项目 2: 语言切换按钮位置</h4>
+                <ul>
+                    <li><strong>问题:</strong> 滑块移动时，语言切换按钮位置也会移动</li>
+                    <li><strong>解决方案:</strong> 使用 <code>margin-left: auto</code> 固定按钮在右侧</li>
+                    <li><strong>效果:</strong> 语言切换按钮始终保持在控制行的最右侧</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="control-section">
+            <h2>🎮 实际控制面板测试</h2>
+            
+            <div class="control-row">
+                <div class="control-group">
+                    <label for="algorithm-select">排序算法:</label>
+                    <select id="algorithm-select">
+                        <option value="bubbleSort">冒泡排序</option>
+                        <option value="selectionSort">选择排序</option>
+                        <option value="insertionSort">插入排序</option>
+                        <option value="mergeSort">归并排序</option>
+                        <option value="quickSort">快速排序</option>
+                        <option value="heapSort">堆排序</option>
+                        <option value="countingSort">计数排序</option>
+                        <option value="radixSort">基数排序</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label for="array-size">数组大小:</label>
+                    <input type="range" id="array-size" min="5" max="70" value="30">
+                    <span id="array-size-value">30</span>
+                </div>
+                
+                <div class="control-group">
+                    <label for="sort-speed">排序速度:</label>
+                    <input type="range" id="sort-speed" min="5" max="300" value="50">
+                    <span id="sort-speed-value">50ms(柱体移动一次耗时)</span>
+                </div>
+                
+                <!-- 语言切换按钮固定在右侧 -->
+                <div class="control-group language-toggle-fixed">
+                    <button id="language-toggle" class="btn btn-secondary tooltip">
+                        <span>🌐</span>
+                        <span id="language-text">中文</span>
+                        <span class="tooltiptext">切换语言</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="control-section">
+            <h2>🧪 测试说明</h2>
+            <div class="test-results">
+                <h4>测试步骤:</h4>
+                <ol>
+                    <li><strong>速度单位测试:</strong> 观察排序速度滑块旁边的单位显示</li>
+                    <li><strong>语言按钮位置测试:</strong> 拖动任意滑块，观察语言切换按钮是否保持在右侧固定位置</li>
+                    <li><strong>响应式测试:</strong> 调整浏览器窗口大小，确认布局正常</li>
+                </ol>
+                
+                <h4>预期结果:</h4>
+                <ul>
+                    <li>✅ 速度显示为 "XXms(柱体移动一次耗时)" 格式</li>
+                    <li>✅ 语言切换按钮始终在控制行最右侧</li>
+                    <li>✅ 滑块移动不影响语言按钮位置</li>
+                    <li>✅ 布局在不同屏幕尺寸下正常显示</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 绑定滑块事件以测试动态更新
+        document.getElementById('sort-speed').addEventListener('input', (e) => {
+            const speed = parseInt(e.target.value);
+            document.getElementById('sort-speed-value').textContent = `${speed}ms(柱体移动一次耗时)`;
+        });
+        
+        document.getElementById('array-size').addEventListener('input', (e) => {
+            const size = parseInt(e.target.value);
+            document.getElementById('array-size-value').textContent = size;
+        });
+        
+        // 语言切换按钮测试
+        document.getElementById('language-toggle').addEventListener('click', () => {
+            const langText = document.getElementById('language-text');
+            if (langText.textContent === '中文') {
+                langText.textContent = 'English';
+            } else {
+                langText.textContent = '中文';
+            }
+        });
+        
+        console.log('✅ Speed unit and language position fix test loaded');
+    </script>
+</body>
+</html>

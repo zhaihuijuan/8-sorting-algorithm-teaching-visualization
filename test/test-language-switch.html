@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>语言切换测试</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #ffffff;
+            padding: 20px;
+        }
+        
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
+        }
+        
+        .status {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>语言切换功能测试</h1>
+        
+        <div class="status">
+            <p><strong>当前语言:</strong> <span id="current-language">zh</span></p>
+            <p><strong>页面标题:</strong> <span id="page-title-display">八大排序算法可视化</span></p>
+            <p><strong>测试文本:</strong> <span id="test-text">生成新数组</span></p>
+        </div>
+        
+        <button id="language-toggle">
+            <span>🌐</span>
+            <span id="language-text">中文</span>
+        </button>
+        
+        <button onclick="testLanguageManager()">测试语言管理器</button>
+        <button onclick="checkElements()">检查DOM元素</button>
+        
+        <div id="debug-info" class="status" style="margin-top: 20px;">
+            <h3>调试信息:</h3>
+            <div id="debug-content">点击"测试语言管理器"查看调试信息</div>
+        </div>
+    </div>
+
+    <script src="language-manager.js"></script>
+    <script>
+        function updateDisplay() {
+            document.getElementById('current-language').textContent = window.languageManager.getCurrentLanguage();
+            document.getElementById('page-title-display').textContent = document.title;
+            document.getElementById('test-text').textContent = window.languageManager.getText('generateArray');
+        }
+        
+        function testLanguageManager() {
+            const debugContent = document.getElementById('debug-content');
+            let info = '';
+            
+            try {
+                info += `语言管理器存在: ${window.languageManager ? '是' : '否'}<br>`;
+                info += `当前语言: ${window.languageManager.getCurrentLanguage()}<br>`;
+                info += `getText方法: ${typeof window.languageManager.getText}<br>`;
+                info += `toggleLanguage方法: ${typeof window.languageManager.toggleLanguage}<br>`;
+                
+                // 测试获取文本
+                const testText = window.languageManager.getText('generateArray');
+                info += `测试文本 (generateArray): ${testText}<br>`;
+                
+                // 测试语言切换
+                const oldLang = window.languageManager.getCurrentLanguage();
+                window.languageManager.toggleLanguage();
+                const newLang = window.languageManager.getCurrentLanguage();
+                info += `语言切换: ${oldLang} -> ${newLang}<br>`;
+                
+                updateDisplay();
+                
+            } catch (error) {
+                info += `错误: ${error.message}<br>`;
+            }
+            
+            debugContent.innerHTML = info;
+        }
+        
+        function checkElements() {
+            const debugContent = document.getElementById('debug-content');
+            let info = '';
+            
+            const languageToggle = document.getElementById('language-toggle');
+            info += `语言切换按钮存在: ${languageToggle ? '是' : '否'}<br>`;
+            
+            if (languageToggle) {
+                info += `按钮事件监听器数量: ${languageToggle.getEventListeners ? languageToggle.getEventListeners('click').length : '无法检测'}<br>`;
+            }
+            
+            debugContent.innerHTML = info;
+        }
+        
+        // 页面加载完成后初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            updateDisplay();
+            
+            // 手动绑定语言切换事件（以防自动绑定失败）
+            const languageToggle = document.getElementById('language-toggle');
+            if (languageToggle && window.languageManager) {
+                languageToggle.addEventListener('click', () => {
+                    console.log('语言切换按钮被点击');
+                    window.languageManager.toggleLanguage();
+                    updateDisplay();
+                });
+                console.log('手动绑定语言切换事件成功');
+            }
+        });
+        
+        // 监听语言切换事件
+        document.addEventListener('languageChanged', (event) => {
+            console.log('语言切换事件触发:', event.detail);
+            updateDisplay();
+        });
+    </script>
+</body>
+</html>

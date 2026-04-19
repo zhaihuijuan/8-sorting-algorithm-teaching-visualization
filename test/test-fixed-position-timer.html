@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>固定位置耗时显示测试</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .timer-display {
+            text-align: center;
+            margin: 40px 0;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 2px solid #4a9eff;
+        }
+        
+        .timer-value {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 48px;
+            font-weight: bold;
+            color: #4a9eff;
+            letter-spacing: 2px;
+            min-width: 300px;
+            display: inline-block;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(74, 158, 255, 0.3);
+        }
+        
+        .timer-label {
+            font-size: 16px;
+            color: #b0b0b0;
+            margin-top: 10px;
+        }
+        
+        .control-buttons {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .test-button {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(74, 158, 255, 0.3);
+        }
+        
+        .test-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .format-examples {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .example-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+        
+        .example-time {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 20px;
+            font-weight: bold;
+            color: #28a745;
+            letter-spacing: 1px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 8px;
+        }
+        
+        .example-desc {
+            font-size: 12px;
+            color: #b0b0b0;
+            text-align: center;
+        }
+        
+        .info-box {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .info-title {
+            color: #ffc107;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .info-content {
+            color: #b0b0b0;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>⏱️ 固定位置耗时显示测试</h1>
+        <p>测试耗时显示的固定位置效果，确保数字位数变化时不会导致布局跳动</p>
+        
+        <div class="info-box">
+            <div class="info-title">🎯 测试目标</div>
+            <div class="info-content">
+                验证耗时显示在数字位数变化时，秒和毫秒部分始终保持固定位置，不会产生视觉跳动。
+                使用等宽字体和固定宽度布局，确保显示的稳定性。
+            </div>
+        </div>
+        
+        <div class="timer-display">
+            <div class="timer-value" id="main-timer">  0ms</div>
+            <div class="timer-label">实时计时器</div>
+        </div>
+        
+        <div class="control-buttons">
+            <button id="start-btn" class="test-button">开始计时</button>
+            <button id="pause-btn" class="test-button" style="background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);" disabled>暂停计时</button>
+            <button id="resume-btn" class="test-button" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);" disabled>继续计时</button>
+            <button id="reset-btn" class="test-button" style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%);">重置计时</button>
+        </div>
+        
+        <div class="info-box">
+            <div class="info-title">📊 格式化规则</div>
+            <div class="info-content">
+                • <strong>小于1秒</strong>: 毫秒固定3位右对齐 (如: "  5ms", "500ms")<br>
+                • <strong>1-59秒</strong>: 秒固定2位 + 毫秒固定3位 (如: " 1s+005ms", "19s+703ms")<br>
+                • <strong>1分钟以上</strong>: 分固定2位 + 秒固定2位 + 毫秒固定3位 (如: " 1m+05s+250ms")
+            </div>
+        </div>
+        
+        <h2>📋 格式化示例</h2>
+        <div class="format-examples" id="examples-grid">
+            <!-- 示例将在这里动态生成 -->
+        </div>
+    </div>
+
+    <script>
+        // 固定位置格式化函数
+        function formatElapsedTime(elapsedTime) {
+            if (elapsedTime < 1000) {
+                // 小于1秒时，毫秒部分固定3位，右对齐
+                return `${elapsedTime.toString().padStart(3, ' ')}ms`;
+            }
+            
+            const seconds = Math.floor(elapsedTime / 1000);
+            const milliseconds = elapsedTime % 1000;
+            
+            if (seconds < 60) {
+                // 1-59秒：秒部分固定2位，毫秒部分固定3位
+                const secPart = seconds.toString().padStart(2, ' ');
+                const msPart = milliseconds.toString().padStart(3, '0');
+                return `${secPart}s+${msPart}ms`;
+            }
+            
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            
+            // 1分钟以上：分钟固定2位，秒固定2位，毫秒固定3位
+            const minPart = minutes.toString().padStart(2, ' ');
+            const secPart = remainingSeconds.toString().padStart(2, '0');
+            const msPart = milliseconds.toString().padStart(3, '0');
+            
+            return `${minPart}m+${secPart}s+${msPart}ms`;
+        }
+
+        // 计时器变量
+        let startTime = null;
+        let pausedTime = 0;
+        let timerInterval = null;
+        let isRunning = false;
+        let isPaused = false;
+
+        // 按钮元素
+        const startBtn = document.getElementById('start-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const resumeBtn = document.getElementById('resume-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const timerDisplay = document.getElementById('main-timer');
+
+        // 开始计时
+        function startTimer() {
+            if (isRunning) return;
+            
+            startTime = Date.now() - pausedTime;
+            isRunning = true;
+            isPaused = false;
+            
+            timerInterval = setInterval(updateTimer, 50); // 每50ms更新一次，更流畅
+            
+            updateButtonStates();
+        }
+
+        // 暂停计时
+        function pauseTimer() {
+            if (!isRunning || isPaused) return;
+            
+            isPaused = true;
+            clearInterval(timerInterval);
+            pausedTime = Date.now() - startTime;
+            
+            updateButtonStates();
+        }
+
+        // 继续计时
+        function resumeTimer() {
+            if (!isPaused) return;
+            
+            startTime = Date.now() - pausedTime;
+            isPaused = false;
+            
+            timerInterval = setInterval(updateTimer, 50);
+            
+            updateButtonStates();
+        }
+
+        // 重置计时
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            isPaused = false;
+            pausedTime = 0;
+            startTime = null;
+            
+            timerDisplay.textContent = '  0ms';
+            updateButtonStates();
+        }
+
+        // 更新计时器显示
+        function updateTimer() {
+            if (!isRunning || isPaused) return;
+            
+            const elapsed = Date.now() - startTime;
+            const formatted = formatElapsedTime(elapsed);
+            timerDisplay.textContent = formatted;
+        }
+
+        // 更新按钮状态
+        function updateButtonStates() {
+            startBtn.disabled = isRunning && !isPaused;
+            pauseBtn.disabled = !isRunning || isPaused;
+            resumeBtn.disabled = !isPaused;
+        }
+
+        // 生成格式化示例
+        function generateExamples() {
+            const examples = [
+                { ms: 0, desc: '0毫秒' },
+                { ms: 5, desc: '5毫秒' },
+                { ms: 50, desc: '50毫秒' },
+                { ms: 500, desc: '500毫秒' },
+                { ms: 999, desc: '999毫秒' },
+                { ms: 1000, desc: '1秒整' },
+                { ms: 1005, desc: '1.005秒' },
+                { ms: 1500, desc: '1.5秒' },
+                { ms: 9999, desc: '9.999秒' },
+                { ms: 19703, desc: '19.703秒' },
+                { ms: 59999, desc: '59.999秒' },
+                { ms: 60000, desc: '1分钟整' },
+                { ms: 65250, desc: '1分5.25秒' },
+                { ms: 125703, desc: '2分5.703秒' },
+                { ms: 599999, desc: '9分59.999秒' },
+                { ms: 3661500, desc: '61分1.5秒' }
+            ];
+            
+            const grid = document.getElementById('examples-grid');
+            grid.innerHTML = '';
+            
+            examples.forEach(example => {
+                const item = document.createElement('div');
+                item.className = 'example-item';
+                
+                const formatted = formatElapsedTime(example.ms);
+                
+                item.innerHTML = `
+                    <div class="example-time">${formatted}</div>
+                    <div class="example-desc">${example.desc} (${example.ms}ms)</div>
+                `;
+                
+                grid.appendChild(item);
+            });
+        }
+
+        // 事件监听器
+        startBtn.addEventListener('click', startTimer);
+        pauseBtn.addEventListener('click', pauseTimer);
+        resumeBtn.addEventListener('click', resumeTimer);
+        resetBtn.addEventListener('click', resetTimer);
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            generateExamples();
+            updateButtonStates();
+        });
+    </script>
+</body>
+</html>

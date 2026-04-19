@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speed Range Adjustment Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .test-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .control-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            border-left: 4px solid #4a9eff;
+        }
+        
+        .control-group {
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .control-group label {
+            min-width: 100px;
+            color: #b0b0b0;
+        }
+        
+        .control-group input[type="range"] {
+            flex: 1;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            outline: none;
+        }
+        
+        .control-group input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .control-group span {
+            min-width: 60px;
+            text-align: center;
+            background: rgba(74, 158, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
+        }
+        
+        .btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+        
+        .speed-demo {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .speed-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #28a745;
+        }
+        
+        .speed-card.active {
+            border-left-color: #ffc107;
+            background: rgba(255, 193, 7, 0.1);
+        }
+        
+        .array-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 150px;
+            justify-content: center;
+            padding: 20px 0 60px 0;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .test-results {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #28a745;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .comparison-table th {
+            background: rgba(74, 158, 255, 0.2);
+            font-weight: bold;
+        }
+        
+        .comparison-table .old-value {
+            color: #ffc107;
+        }
+        
+        .comparison-table .new-value {
+            color: #28a745;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>⚡ Speed Range Adjustment Test</h1>
+        <p>测试速度范围调整：从 10-200ms 调整为 5-300ms，让最快更快，最慢更慢。</p>
+        
+        <div class="control-section">
+            <h2>📊 速度对比</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>项目</th>
+                        <th>修改前</th>
+                        <th>修改后</th>
+                        <th>变化</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>最快速度</td>
+                        <td class="old-value">10ms</td>
+                        <td class="new-value">5ms</td>
+                        <td>快了 50%</td>
+                    </tr>
+                    <tr>
+                        <td>最慢速度</td>
+                        <td class="old-value">200ms</td>
+                        <td class="new-value">300ms</td>
+                        <td>慢了 50%</td>
+                    </tr>
+                    <tr>
+                        <td>默认速度</td>
+                        <td>50ms</td>
+                        <td class="new-value">50ms</td>
+                        <td>保持不变</td>
+                    </tr>
+                    <tr>
+                        <td>总范围</td>
+                        <td class="old-value">190ms</td>
+                        <td class="new-value">295ms</td>
+                        <td>扩大了 55%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="control-section">
+            <h2>🎮 速度控制</h2>
+            
+            <div class="control-group">
+                <label for="sort-speed">排序速度:</label>
+                <input type="range" id="sort-speed" min="5" max="300" value="50">
+                <span id="sort-speed-value">50ms</span>
+            </div>
+            
+            <div class="speed-demo">
+                <div class="speed-card" id="fast-card">
+                    <h4>🚀 极速模式</h4>
+                    <p>5ms - 超快速度</p>
+                    <button onclick="setSpeed(5)" class="btn">设置极速</button>
+                </div>
+                <div class="speed-card active" id="normal-card">
+                    <h4>⚖️ 标准模式</h4>
+                    <p>50ms - 默认速度</p>
+                    <button onclick="setSpeed(50)" class="btn">设置标准</button>
+                </div>
+                <div class="speed-card" id="slow-card">
+                    <h4>🐌 慢速模式</h4>
+                    <p>300ms - 超慢速度</p>
+                    <button onclick="setSpeed(300)" class="btn">设置慢速</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="control-section">
+            <h2>🧪 排序测试</h2>
+            
+            <div style="margin-bottom: 15px;">
+                <label>算法选择:</label>
+                <select id="algorithm-select" style="margin-left: 10px; padding: 5px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px;">
+                    <option value="bubbleSort">冒泡排序</option>
+                    <option value="selectionSort">选择排序</option>
+                    <option value="insertionSort">插入排序</option>
+                </select>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <button id="generate-array" class="btn">🎲 生成新数组</button>
+                <button id="start-sort" class="btn btn-success">▶️ 开始排序</button>
+                <button id="pause-sort" class="btn btn-warning" disabled>⏸️ 暂停</button>
+                <button id="resume-sort" class="btn btn-success hidden">▶️ 继续</button>
+                <button id="reset-sort" class="btn btn-danger">🔄 重置</button>
+            </div>
+        </div>
+        
+        <div class="control-section">
+            <h2>📈 测试结果</h2>
+            <div id="test-results" class="test-results">
+                <h4>速度测试说明</h4>
+                <ul>
+                    <li><strong>极速模式 (5ms)</strong>: 适合快速演示和概览</li>
+                    <li><strong>标准模式 (50ms)</strong>: 适合正常学习和观察</li>
+                    <li><strong>慢速模式 (300ms)</strong>: 适合详细分析每个步骤</li>
+                </ul>
+                <p>尝试不同的速度设置，观察排序过程的变化。</p>
+            </div>
+        </div>
+        
+        <!-- 可视化区域 -->
+        <div class="array-container" id="array-container">
+            <!-- 柱状图将在这里动态生成 -->
+        </div>
+    </div>
+
+    <script src="language-manager.js"></script>
+    <script src="sorting-algorithms.js"></script>
+    <script src="ui-handler.js"></script>
+    <script>
+        function setSpeed(speed) {
+            const slider = document.getElementById('sort-speed');
+            const valueDisplay = document.getElementById('sort-speed-value');
+            
+            slider.value = speed;
+            valueDisplay.textContent = `${speed}ms`;
+            
+            // 更新UI Handler的速度
+            if (window.uiHandler) {
+                window.uiHandler.changeSpeed(speed);
+            }
+            
+            // 更新速度卡片的激活状态
+            updateSpeedCards(speed);
+            
+            // 更新测试结果
+            updateTestResults(speed);
+        }
+        
+        function updateSpeedCards(currentSpeed) {
+            const cards = {
+                'fast-card': 5,
+                'normal-card': 50,
+                'slow-card': 300
+            };
+            
+            Object.entries(cards).forEach(([cardId, speed]) => {
+                const card = document.getElementById(cardId);
+                if (Math.abs(currentSpeed - speed) < 10) {
+                    card.classList.add('active');
+                } else {
+                    card.classList.remove('active');
+                }
+            });
+        }
+        
+        function updateTestResults(speed) {
+            const resultsContainer = document.getElementById('test-results');
+            
+            let speedCategory = '';
+            let description = '';
+            
+            if (speed <= 10) {
+                speedCategory = '极速模式';
+                description = '非常快的速度，适合快速演示整个排序过程。可能难以看清单个步骤的细节。';
+            } else if (speed <= 30) {
+                speedCategory = '快速模式';
+                description = '较快的速度，适合对排序算法有一定了解的用户。';
+            } else if (speed <= 80) {
+                speedCategory = '标准模式';
+                description = '适中的速度，平衡了观察细节和整体进度。适合学习和演示。';
+            } else if (speed <= 150) {
+                speedCategory = '慢速模式';
+                description = '较慢的速度，便于观察每个步骤的细节。适合初学者和教学。';
+            } else {
+                speedCategory = '超慢模式';
+                description = '非常慢的速度，可以清楚地看到每一个操作。适合详细分析算法逻辑。';
+            }
+            
+            resultsContainer.innerHTML = `
+                <h4>当前速度: ${speed}ms - ${speedCategory}</h4>
+                <p>${description}</p>
+                <div style="margin-top: 15px;">
+                    <strong>速度范围测试:</strong>
+                    <ul>
+                        <li>最快速度 (5ms): ${speed === 5 ? '✅ 当前' : '可测试'}</li>
+                        <li>标准速度 (50ms): ${speed === 50 ? '✅ 当前' : '可测试'}</li>
+                        <li>最慢速度 (300ms): ${speed === 300 ? '✅ 当前' : '可测试'}</li>
+                    </ul>
+                </div>
+            `;
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 绑定滑块事件
+            const slider = document.getElementById('sort-speed');
+            slider.addEventListener('input', (e) => {
+                const speed = parseInt(e.target.value);
+                document.getElementById('sort-speed-value').textContent = `${speed}ms`;
+                
+                if (window.uiHandler) {
+                    window.uiHandler.changeSpeed(speed);
+                }
+                
+                updateSpeedCards(speed);
+                updateTestResults(speed);
+            });
+            
+            // 等待UI Handler初始化
+            setTimeout(() => {
+                if (window.uiHandler) {
+                    console.log('✅ UI Handler initialized');
+                    updateSpeedCards(50);
+                    updateTestResults(50);
+                } else {
+                    console.log('❌ UI Handler not found');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

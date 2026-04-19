@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教学模式最终测试</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 12px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(74, 158, 255, 0.3);
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+        }
+        
+        .array-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 200px;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .array-bar {
+            width: 30px;
+            background: linear-gradient(135deg, #87ceeb 0%, #5dade2 100%);
+            border-radius: 4px 4px 0 0;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 1px 3px rgba(135, 206, 235, 0.2);
+        }
+        
+        .array-bar.completed {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            box-shadow: 0 1px 3px rgba(39, 174, 96, 0.2);
+        }
+        
+        .array-bar.comparing {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            box-shadow: 0 1px 3px rgba(255, 193, 7, 0.3);
+            transform: translateY(-5px);
+        }
+        
+        .array-bar.swapping {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+            transform: translateY(-8px) scale(1.05);
+        }
+        
+        .status-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .status-item {
+            padding: 8px 12px;
+            background: rgba(74, 158, 255, 0.2);
+            border-radius: 6px;
+            font-size: 14px;
+            border-left: 3px solid #4a9eff;
+        }
+        
+        .current-step {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            min-height: 60px;
+            border-left: 4px solid #4a9eff;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .test-log {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            border-left: 4px solid #4caf50;
+            color: #4caf50;
+        }
+        
+        .test-error {
+            border-left-color: #f44336;
+            color: #f44336;
+        }
+        
+        .test-warning {
+            border-left-color: #ff9800;
+            color: #ff9800;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align: center; color: #4a9eff; margin-bottom: 30px;">🎓 教学模式最终测试</h1>
+        
+        <div class="controls">
+            <button class="btn btn-success" onclick="enableTeachingMode()">🎓 启用教学模式</button>
+            <button class="btn btn-warning" onclick="disableTeachingMode()">⚡ 关闭教学模式</button>
+            <button class="btn" onclick="startBubbleSort()">🫧 开始冒泡排序</button>
+            <button class="btn" onclick="resetArray()">🔄 重置数组</button>
+            <button class="btn" onclick="clearLog()">🧹 清除日志</button>
+        </div>
+        
+        <div class="array-container" id="array-container">
+            <!-- 数组可视化 -->
+        </div>
+        
+        <div class="status-panel">
+            <div class="status-item">比较次数: <span id="comparison-count">0</span></div>
+            <div class="status-item">交换次数: <span id="swap-count">0</span></div>
+            <div class="status-item">耗时: <span id="elapsed-time">0ms</span></div>
+            <div class="status-item">已排序: <span id="sorted-count">0</span></div>
+            <div class="status-item">教学模式: <span id="teaching-status">关闭</span></div>
+        </div>
+        
+        <div class="current-step" id="current-step">
+            点击上方按钮开始测试教学模式...
+        </div>
+        
+        <div class="test-log" id="test-log">
+            测试日志将在这里显示...
+        </div>
+    </div>
+
+    <!-- 引入必要的脚本 -->
+    <script src="language-manager.js"></script>
+    <script src="sorting-algorithms.js"></script>
+    <script src="ui-handler.js"></script>
+
+    <script>
+        let testEngine = null;
+        let testVisualizer = null;
+        let testUIHandler = null;
+        let isTeachingMode = false;
+        
+        function log(message, type = 'info') {
+            const logElement = document.getElementById('test-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️';
+            logElement.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+            
+            // 更改样式
+            logElement.className = `test-log ${type === 'error' ? 'test-error' : type === 'warning' ? 'test-warning' : ''}`;
+        }
+        
+        function clearLog() {
+            document.getElementById('test-log').textContent = '测试日志已清除...\n';
+        }
+        
+        function updateCurrentStep(message) {
+            document.getElementById('current-step').textContent = message;
+        }
+        
+        function updateTeachingStatus() {
+            document.getElementById('teaching-status').textContent = isTeachingMode ? '开启' : '关闭';
+            document.getElementById('teaching-status').style.color = isTeachingMode ? '#28a745' : '#6c757d';
+        }
+        
+        // 初始化测试环境
+        function initTestEnvironment() {
+            try {
+                // 创建语言管理器
+                const languageManager = new LanguageManager();
+                window.languageManager = languageManager;
+                
+                // 创建可视化器
+                testVisualizer = new Visualizer(document.getElementById('array-container'));
+                
+                // 创建排序引擎
+                testEngine = new SortingEngine(testVisualizer);
+                
+                // 创建UI处理器
+                testUIHandler = new UIHandler();
+                testUIHandler.visualizer = testVisualizer;
+                testUIHandler.sortingEngine = testEngine;
+                
+                // 设置全局引用
+                window.uiHandler = testUIHandler;
+                
+                // 生成测试数组
+                const testArray = [8, 3, 5, 1, 9, 2, 7, 4];
+                testEngine.setArray(testArray);
+                testVisualizer.renderArray(testArray);
+                
+                log('测试环境初始化完成', 'success');
+                updateCurrentStep('测试环境已准备就绪');
+                
+                return true;
+            } catch (error) {
+                log(`环境初始化失败: ${error.message}`, 'error');
+                console.error('Init error:', error);
+                return false;
+            }
+        }
+        
+        function enableTeachingMode() {
+            if (!testEngine || !testUIHandler) {
+                if (!initTestEnvironment()) return;
+            }
+            
+            isTeachingMode = true;
+            testEngine.setTeachingMode(true);
+            testUIHandler.teachingMode = true;
+            
+            updateTeachingStatus();
+            log('教学模式已启用', 'success');
+            updateCurrentStep('教学模式已启用 - 排序将逐步执行，每一步都会显示详细解释');
+        }
+        
+        function disableTeachingMode() {
+            if (!testEngine || !testUIHandler) {
+                if (!initTestEnvironment()) return;
+            }
+            
+            isTeachingMode = false;
+            testEngine.setTeachingMode(false);
+            testUIHandler.teachingMode = false;
+            
+            updateTeachingStatus();
+            log('教学模式已关闭', 'info');
+            updateCurrentStep('教学模式已关闭 - 排序将连续执行');
+        }
+        
+        async function startBubbleSort() {
+            if (!testEngine || !testUIHandler) {
+                if (!initTestEnvironment()) return;
+            }
+            
+            log(`开始冒泡排序 (教学模式: ${isTeachingMode ? '开启' : '关闭'})`, 'info');
+            updateCurrentStep('开始执行冒泡排序...');
+            
+            try {
+                const startTime = Date.now();
+                
+                // 确保教学模式状态同步
+                testEngine.setTeachingMode(isTeachingMode);
+                testUIHandler.teachingMode = isTeachingMode;
+                
+                await testEngine.sort('bubbleSort');
+                
+                const endTime = Date.now();
+                const duration = endTime - startTime;
+                
+                log(`冒泡排序完成，耗时: ${duration}ms`, 'success');
+                updateCurrentStep(`冒泡排序完成！数组已完全排序。耗时: ${duration}ms`);
+                
+                // 分析结果
+                if (isTeachingMode && duration < 1000) {
+                    log('⚠️ 警告：教学模式下排序完成太快，可能没有正确等待用户确认', 'warning');
+                } else if (isTeachingMode && duration >= 1000) {
+                    log('✅ 教学模式工作正常：排序过程有适当的等待时间', 'success');
+                } else if (!isTeachingMode && duration > 5000) {
+                    log('⚠️ 警告：普通模式下排序时间过长', 'warning');
+                } else {
+                    log('✅ 排序模式工作正常', 'success');
+                }
+                
+            } catch (error) {
+                log(`排序过程中出现错误: ${error.message}`, 'error');
+                console.error('Sorting error:', error);
+                updateCurrentStep('排序过程中出现错误');
+            }
+        }
+        
+        function resetArray() {
+            if (!testEngine || !testVisualizer) {
+                if (!initTestEnvironment()) return;
+            }
+            
+            // 停止当前排序
+            if (testEngine.isRunning) {
+                testEngine.stop();
+            }
+            
+            // 生成新的测试数组
+            const testArray = [8, 3, 5, 1, 9, 2, 7, 4];
+            testEngine.setArray(testArray);
+            testVisualizer.reset();
+            testVisualizer.renderArray(testArray);
+            
+            // 重置统计
+            document.getElementById('comparison-count').textContent = '0';
+            document.getElementById('swap-count').textContent = '0';
+            document.getElementById('elapsed-time').textContent = '0ms';
+            document.getElementById('sorted-count').textContent = '0';
+            
+            log('数组已重置', 'info');
+            updateCurrentStep('数组已重置，可以开始新的排序测试');
+        }
+        
+        // 页面加载完成后初始化
+        window.addEventListener('load', () => {
+            log('页面加载完成', 'info');
+            
+            // 检查必要的类是否存在
+            if (typeof SortingEngine === 'undefined') {
+                log('❌ SortingEngine 类未找到', 'error');
+                return;
+            }
+            
+            if (typeof Visualizer === 'undefined') {
+                log('❌ Visualizer 类未找到', 'error');
+                return;
+            }
+            
+            if (typeof UIHandler === 'undefined') {
+                log('❌ UIHandler 类未找到', 'error');
+                return;
+            }
+            
+            if (typeof LanguageManager === 'undefined') {
+                log('❌ LanguageManager 类未找到', 'error');
+                return;
+            }
+            
+            log('✅ 所有必要的类都已加载', 'success');
+            
+            // 初始化测试环境
+            if (initTestEnvironment()) {
+                updateTeachingStatus();
+                log('📋 准备就绪，可以开始测试教学模式', 'success');
+            }
+        });
+    </script>
+</body>
+</html>

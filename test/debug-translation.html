@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Translation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
+            color: white;
+            padding: 20px;
+        }
+        .test-item {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        button {
+            background: #4a9eff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        .debug-info {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Translation Debug Test</h1>
+    
+    <button id="language-toggle">Toggle Language</button>
+    <button onclick="debugTranslations()">Debug Translations</button>
+    <button onclick="manualUpdate()">Manual Update</button>
+    
+    <div class="test-item">
+        <h3>Test Elements</h3>
+        <p>Display Mode: <label data-translate="displayModeLabel">显示模式:</label></p>
+        <p>Color Legend: <label data-translate="colorLegend.title">颜色含义:</label></p>
+        <p>Pointer Position: <strong data-translate="stats.pointerPosition">指针位置:</strong></p>
+    </div>
+    
+    <div id="debug-output" class="debug-info">
+        Debug output will appear here...
+    </div>
+
+    <script src="language-manager.js"></script>
+    <script>
+        function debugTranslations() {
+            const output = document.getElementById('debug-output');
+            let debugInfo = [];
+            
+            debugInfo.push('=== Translation Debug Info ===');
+            debugInfo.push(`Current Language: ${window.languageManager ? window.languageManager.getCurrentLanguage() : 'No language manager'}`);
+            debugInfo.push('');
+            
+            // Test translation keys
+            const testKeys = [
+                'displayModeLabel',
+                'colorLegend.title',
+                'stats.pointerPosition'
+            ];
+            
+            testKeys.forEach(key => {
+                if (window.languageManager) {
+                    const text = window.languageManager.getText(key);
+                    debugInfo.push(`Key: ${key} -> "${text}"`);
+                } else {
+                    debugInfo.push(`Key: ${key} -> No language manager`);
+                }
+            });
+            
+            debugInfo.push('');
+            debugInfo.push('=== DOM Elements ===');
+            
+            // Check DOM elements
+            const elements = document.querySelectorAll('[data-translate]');
+            debugInfo.push(`Found ${elements.length} elements with data-translate attribute`);
+            
+            elements.forEach((element, index) => {
+                const key = element.getAttribute('data-translate');
+                const currentText = element.textContent;
+                debugInfo.push(`Element ${index + 1}: key="${key}", text="${currentText}"`);
+            });
+            
+            output.textContent = debugInfo.join('\n');
+        }
+        
+        function manualUpdate() {
+            if (window.languageManager) {
+                console.log('Manually calling updateAllTexts()');
+                window.languageManager.updateAllTexts();
+                debugTranslations();
+            } else {
+                console.log('No language manager available');
+            }
+        }
+        
+        // Wait for language manager to be ready
+        setTimeout(() => {
+            if (window.languageManager) {
+                console.log('Language manager is ready');
+                
+                // Set up language toggle
+                const toggleBtn = document.getElementById('language-toggle');
+                toggleBtn.addEventListener('click', () => {
+                    console.log('Language toggle clicked');
+                    window.languageManager.toggleLanguage();
+                    setTimeout(debugTranslations, 100);
+                });
+                
+                // Initial debug
+                debugTranslations();
+            } else {
+                console.log('Language manager not found');
+                document.getElementById('debug-output').textContent = 'Language manager not found!';
+            }
+        }, 500);
+        
+        // Listen for language changes
+        document.addEventListener('languageChanged', (event) => {
+            console.log('Language changed event received:', event.detail);
+            setTimeout(debugTranslations, 100);
+        });
+    </script>
+</body>
+</html>

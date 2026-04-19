@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speed Unit Translation Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .test-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .control-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            border-left: 4px solid #4a9eff;
+        }
+        
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-group label {
+            font-size: 14px;
+            color: #b0b0b0;
+            min-width: 80px;
+        }
+        
+        /* 语言切换按钮固定位置样式 */
+        .language-toggle-fixed {
+            margin-left: auto !important;
+            flex-shrink: 0;
+        }
+        
+        select, input[type="range"] {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #ffffff;
+            padding: 8px 12px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #4a9eff;
+            box-shadow: 0 0 10px rgba(74, 158, 255, 0.3);
+        }
+
+        select option {
+            background: #1a1a2e;
+            color: #ffffff;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 10px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(74, 158, 255, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+        }
+        
+        .test-results {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #28a745;
+        }
+        
+        .highlight {
+            background: rgba(255, 193, 7, 0.2);
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #ffc107;
+            font-weight: bold;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .comparison-table th {
+            background: rgba(74, 158, 255, 0.2);
+            font-weight: bold;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1000;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🌐 Speed Unit Translation Test</h1>
+        <p>测试速度单位的中英文切换功能</p>
+        
+        <div class="control-section">
+            <h2>📊 翻译对比</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>语言</th>
+                        <th>速度单位显示</th>
+                        <th>含义</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>中文</td>
+                        <td class="highlight">50ms(柱体移动一次耗时)</td>
+                        <td>清楚说明了速度参数的实际作用</td>
+                    </tr>
+                    <tr>
+                        <td>English</td>
+                        <td class="highlight">50ms(time per bar movement)</td>
+                        <td>Clear explanation of speed parameter function</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="control-section">
+            <h2>🎮 实际控制面板测试</h2>
+            
+            <div class="control-row">
+                <div class="control-group">
+                    <label for="algorithm-select">排序算法:</label>
+                    <select id="algorithm-select">
+                        <option value="bubbleSort">冒泡排序</option>
+                        <option value="selectionSort">选择排序</option>
+                        <option value="insertionSort">插入排序</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label for="array-size">数组大小:</label>
+                    <input type="range" id="array-size" min="5" max="70" value="30">
+                    <span id="array-size-value">30</span>
+                </div>
+                
+                <div class="control-group">
+                    <label for="sort-speed">排序速度:</label>
+                    <input type="range" id="sort-speed" min="5" max="300" value="50">
+                    <span id="sort-speed-value">50ms(柱体移动一次耗时)</span>
+                </div>
+                
+                <!-- 语言切换按钮固定在右侧 -->
+                <div class="control-group language-toggle-fixed">
+                    <button id="language-toggle" class="btn btn-secondary tooltip">
+                        <span>🌐</span>
+                        <span id="language-text">中文</span>
+                        <span class="tooltiptext">切换语言</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="control-section">
+            <h2>🧪 测试说明</h2>
+            <div class="test-results">
+                <h4>测试步骤:</h4>
+                <ol>
+                    <li><strong>初始状态检查:</strong> 确认速度单位显示为中文版本</li>
+                    <li><strong>语言切换测试:</strong> 点击语言切换按钮，观察速度单位是否同步切换</li>
+                    <li><strong>滑块交互测试:</strong> 拖动速度滑块，确认单位文本保持当前语言</li>
+                    <li><strong>往返切换测试:</strong> 多次切换语言，确认功能稳定</li>
+                </ol>
+                
+                <h4>预期结果:</h4>
+                <ul>
+                    <li>✅ 中文模式: "XXms(柱体移动一次耗时)"</li>
+                    <li>✅ 英文模式: "XXms(time per bar movement)"</li>
+                    <li>✅ 语言切换时速度单位同步更新</li>
+                    <li>✅ 滑块拖动时保持当前语言的单位显示</li>
+                </ul>
+                
+                <h4>技术实现:</h4>
+                <ul>
+                    <li><strong>翻译配置:</strong> 在language-manager.js中添加speedUnit翻译项</li>
+                    <li><strong>动态更新:</strong> changeSpeed方法使用languageManager.getText('speedUnit')</li>
+                    <li><strong>语言切换同步:</strong> updateAllTexts方法中调用updateSpeedUnit</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="control-section">
+            <h2>📈 测试状态</h2>
+            <div id="test-status" class="test-results">
+                <p>等待测试...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="language-manager.js"></script>
+    <script src="sorting-algorithms.js"></script>
+    <script src="ui-handler.js"></script>
+    <script>
+        let testResults = [];
+        
+        function updateTestStatus() {
+            const statusDiv = document.getElementById('test-status');
+            const currentLang = window.languageManager ? window.languageManager.getCurrentLanguage() : 'unknown';
+            const speedValue = document.getElementById('sort-speed-value').textContent;
+            
+            statusDiv.innerHTML = `
+                <h4>当前状态:</h4>
+                <ul>
+                    <li><strong>当前语言:</strong> ${currentLang === 'zh' ? '中文' : currentLang === 'en' ? 'English' : currentLang}</li>
+                    <li><strong>速度显示:</strong> <span class="highlight">${speedValue}</span></li>
+                    <li><strong>语言管理器:</strong> ${window.languageManager ? '✅ 已加载' : '❌ 未加载'}</li>
+                    <li><strong>UI处理器:</strong> ${window.uiHandler ? '✅ 已加载' : '❌ 未加载'}</li>
+                </ul>
+            `;
+        }
+        
+        function testSpeedUnitTranslation() {
+            const results = [];
+            
+            // 测试中文状态
+            if (window.languageManager) {
+                window.languageManager.setLanguage('zh');
+                const zhUnit = window.languageManager.getText('speedUnit');
+                results.push(`中文单位: ${zhUnit}`);
+                
+                // 测试英文状态
+                window.languageManager.setLanguage('en');
+                const enUnit = window.languageManager.getText('speedUnit');
+                results.push(`英文单位: ${enUnit}`);
+                
+                // 恢复中文
+                window.languageManager.setLanguage('zh');
+            }
+            
+            return results;
+        }
+        
+        // 绑定滑块事件以测试动态更新
+        document.getElementById('sort-speed').addEventListener('input', (e) => {
+            const speed = parseInt(e.target.value);
+            if (window.uiHandler) {
+                window.uiHandler.changeSpeed(speed);
+            } else {
+                // 如果UI Handler未加载，手动更新
+                const speedUnit = window.languageManager ? window.languageManager.getText('speedUnit') : 'ms(柱体移动一次耗时)';
+                document.getElementById('sort-speed-value').textContent = `${speed}${speedUnit}`;
+            }
+            updateTestStatus();
+        });
+        
+        document.getElementById('array-size').addEventListener('input', (e) => {
+            const size = parseInt(e.target.value);
+            document.getElementById('array-size-value').textContent = size;
+        });
+        
+        // 监听语言切换事件
+        document.addEventListener('languageChanged', (event) => {
+            console.log('Language changed to:', event.detail.language);
+            updateTestStatus();
+        });
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                updateTestStatus();
+                
+                // 运行翻译测试
+                const translationResults = testSpeedUnitTranslation();
+                console.log('Translation test results:', translationResults);
+            }, 1000);
+        });
+        
+        // 定期更新状态
+        setInterval(updateTestStatus, 2000);
+        
+        console.log('✅ Speed unit translation test loaded');
+    </script>
+</body>
+</html>

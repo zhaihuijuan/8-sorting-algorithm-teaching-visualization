@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教学模式调试测试</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 12px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(74, 158, 255, 0.3);
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+        }
+        
+        .test-result {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            border-left: 4px solid #4caf50;
+            color: #4caf50;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .test-error {
+            border-left-color: #f44336;
+            color: #f44336;
+        }
+        
+        .test-warning {
+            border-left-color: #ff9800;
+            color: #ff9800;
+        }
+        
+        .test-info {
+            border-left-color: #2196f3;
+            color: #2196f3;
+        }
+        
+        .mini-visualizer {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 100px;
+            justify-content: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .mini-bar {
+            width: 20px;
+            background: linear-gradient(135deg, #87ceeb 0%, #5dade2 100%);
+            border-radius: 3px 3px 0 0;
+            position: relative;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        
+        .mini-bar.completed {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        }
+        
+        .mini-bar.comparing {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        }
+        
+        .mini-bar.swapping {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 style="text-align: center; color: #4a9eff; margin-bottom: 30px;">🐛 教学模式调试测试</h1>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <button class="btn btn-success" onclick="debugTeachingMode()">🔍 调试教学模式</button>
+            <button class="btn btn-warning" onclick="testStepByStep()">👣 逐步测试</button>
+            <button class="btn" onclick="clearResults()">🧹 清除结果</button>
+        </div>
+        
+        <div class="mini-visualizer" id="mini-visualizer">
+            <!-- 迷你可视化器 -->
+        </div>
+        
+        <div id="test-results" class="test-result">
+            点击上方按钮开始调试...
+        </div>
+    </div>
+
+    <script>
+        // 引入必要的脚本
+        const scripts = ['language-manager.js', 'sorting-algorithms.js', 'ui-handler.js'];
+        let scriptsLoaded = 0;
+        
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+        
+        async function loadAllScripts() {
+            try {
+                for (const script of scripts) {
+                    await loadScript(script);
+                    log(`✅ 已加载: ${script}`, 'success');
+                }
+                log('🎉 所有脚本加载完成', 'success');
+                return true;
+            } catch (error) {
+                log(`❌ 脚本加载失败: ${error.message}`, 'error');
+                return false;
+            }
+        }
+        
+        function log(message, type = 'info') {
+            const results = document.getElementById('test-results');
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️';
+            results.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            results.scrollTop = results.scrollHeight;
+            
+            // 更改样式
+            results.className = `test-result test-${type}`;
+        }
+        
+        function clearResults() {
+            document.getElementById('test-results').textContent = '调试日志已清除...\n';
+        }
+        
+        // 模拟排序引擎用于调试
+        class DebugSortingEngine {
+            constructor() {
+                this.array = [5, 2, 8, 1, 9];
+                this.teachingMode = false;
+                this.isRunning = false;
+                this.isStopped = false;
+                this.visualizer = new DebugVisualizer();
+                this.stepCount = 0;
+            }
+            
+            setTeachingMode(enabled) {
+                this.teachingMode = enabled;
+                log(`🎓 教学模式设置为: ${enabled}`, enabled ? 'warning' : 'info');
+            }
+            
+            async teachingStep(stepType, params) {
+                this.stepCount++;
+                log(`📚 教学步骤 ${this.stepCount}: ${stepType}`, 'warning');
+                log(`   参数: ${JSON.stringify(params)}`, 'info');
+                
+                if (!this.teachingMode || this.isStopped) {
+                    log(`   跳过教学步骤 (teachingMode: ${this.teachingMode}, isStopped: ${this.isStopped})`, 'warning');
+                    return true;
+                }
+                
+                // 模拟用户确认
+                return new Promise(resolve => {
+                    log(`   等待用户确认...`, 'warning');
+                    setTimeout(() => {
+                        log(`   用户确认继续`, 'success');
+                        resolve(true);
+                    }, 1000);
+                });
+            }
+            
+            async compare(i, j) {
+                if (this.isStopped) return false;
+                
+                log(`🔍 比较 array[${i}]=${this.array[i]} 和 array[${j}]=${this.array[j]}`, 'info');
+                
+                // 教学模式提示
+                if (this.teachingMode) {
+                    const shouldContinue = await this.teachingStep('comparing', {
+                        value1: this.array[i],
+                        value2: this.array[j],
+                        pos1: i,
+                        pos2: j
+                    });
+                    if (!shouldContinue) {
+                        log(`   用户取消，停止排序`, 'warning');
+                        return false;
+                    }
+                }
+                
+                this.visualizer.highlightComparison(i, j);
+                await this.delay(500);
+                
+                const result = this.array[i] > this.array[j];
+                log(`   比较结果: ${result}`, result ? 'warning' : 'success');
+                return result;
+            }
+            
+            async swap(i, j) {
+                if (this.isStopped) return;
+                
+                if (i !== j) {
+                    log(`🔄 交换 array[${i}]=${this.array[i]} 和 array[${j}]=${this.array[j]}`, 'warning');
+                    
+                    // 教学模式提示
+                    if (this.teachingMode) {
+                        const shouldContinue = await this.teachingStep('swapping', {
+                            value1: this.array[i],
+                            value2: this.array[j],
+                            pos1: i,
+                            pos2: j
+                        });
+                        if (!shouldContinue) {
+                            log(`   用户取消，停止排序`, 'warning');
+                            return;
+                        }
+                    }
+                    
+                    this.visualizer.highlightSwap(i, j);
+                    [this.array[i], this.array[j]] = [this.array[j], this.array[i]];
+                    this.visualizer.renderArray(this.array);
+                    await this.delay(500);
+                    
+                    log(`   交换完成: [${this.array.join(', ')}]`, 'success');
+                }
+            }
+            
+            async delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+            
+            async bubbleSort() {
+                log(`🫧 开始冒泡排序`, 'success');
+                log(`   初始数组: [${this.array.join(', ')}]`, 'info');
+                
+                const n = this.array.length;
+                
+                for (let i = 0; i < n - 1 && !this.isStopped; i++) {
+                    log(`\n🔄 第 ${i + 1} 轮排序`, 'info');
+                    let swapped = false;
+                    
+                    for (let j = 0; j < n - i - 1 && !this.isStopped; j++) {
+                        if (await this.compare(j, j + 1)) {
+                            await this.swap(j, j + 1);
+                            swapped = true;
+                        }
+                    }
+                    
+                    log(`   第 ${i + 1} 轮完成，数组: [${this.array.join(', ')}]`, 'success');
+                    this.visualizer.markAsSorted([n - i - 1]);
+                    
+                    if (!swapped) {
+                        log(`   没有交换发生，排序提前完成`, 'success');
+                        break;
+                    }
+                }
+                
+                log(`\n🎉 冒泡排序完成！最终数组: [${this.array.join(', ')}]`, 'success');
+            }
+            
+            async sort() {
+                this.isRunning = true;
+                this.isStopped = false;
+                this.stepCount = 0;
+                
+                try {
+                    await this.bubbleSort();
+                } catch (error) {
+                    log(`❌ 排序过程中出现错误: ${error.message}`, 'error');
+                } finally {
+                    this.isRunning = false;
+                    log(`\n📊 排序统计:`, 'info');
+                    log(`   教学步骤数: ${this.stepCount}`, 'info');
+                    log(`   教学模式: ${this.teachingMode ? '开启' : '关闭'}`, 'info');
+                    
+                    // 这里是关键：检查finally块的逻辑
+                    if (!this.isStopped && !this.teachingMode) {
+                        log(`   自动标记所有元素为已排序`, 'warning');
+                        this.visualizer.markAllAsSorted();
+                    } else if (this.teachingMode) {
+                        log(`   教学模式下不自动标记所有元素`, 'success');
+                    }
+                }
+            }
+        }
+        
+        class DebugVisualizer {
+            constructor() {
+                this.sortedIndices = new Set();
+                this.container = document.getElementById('mini-visualizer');
+            }
+            
+            renderArray(array) {
+                this.container.innerHTML = '';
+                array.forEach((value, index) => {
+                    const bar = document.createElement('div');
+                    bar.className = 'mini-bar';
+                    bar.style.height = `${value * 8}px`;
+                    bar.textContent = value;
+                    
+                    if (this.sortedIndices.has(index)) {
+                        bar.classList.add('completed');
+                    }
+                    
+                    this.container.appendChild(bar);
+                });
+            }
+            
+            highlightComparison(i, j) {
+                const bars = this.container.children;
+                if (bars[i]) bars[i].classList.add('comparing');
+                if (bars[j]) bars[j].classList.add('comparing');
+            }
+            
+            highlightSwap(i, j) {
+                const bars = this.container.children;
+                if (bars[i]) {
+                    bars[i].classList.remove('comparing');
+                    bars[i].classList.add('swapping');
+                }
+                if (bars[j]) {
+                    bars[j].classList.remove('comparing');
+                    bars[j].classList.add('swapping');
+                }
+            }
+            
+            markAsSorted(indices) {
+                const bars = this.container.children;
+                indices.forEach(index => {
+                    if (bars[index]) {
+                        bars[index].classList.add('completed');
+                        this.sortedIndices.add(index);
+                    }
+                });
+            }
+            
+            markAllAsSorted() {
+                const bars = this.container.children;
+                for (let i = 0; i < bars.length; i++) {
+                    bars[i].classList.add('completed');
+                    this.sortedIndices.add(i);
+                }
+            }
+        }
+        
+        let debugEngine = new DebugSortingEngine();
+        
+        async function debugTeachingMode() {
+            clearResults();
+            log('🐛 开始调试教学模式', 'info');
+            
+            // 重置引擎
+            debugEngine = new DebugSortingEngine();
+            debugEngine.visualizer.renderArray(debugEngine.array);
+            
+            // 开启教学模式
+            debugEngine.setTeachingMode(true);
+            
+            // 开始排序
+            log('\n🚀 开始排序...', 'info');
+            await debugEngine.sort();
+            
+            log('\n🏁 调试完成', 'success');
+        }
+        
+        async function testStepByStep() {
+            clearResults();
+            log('👣 开始逐步测试', 'info');
+            
+            // 测试各个组件
+            log('\n1. 测试教学步骤方法', 'info');
+            debugEngine = new DebugSortingEngine();
+            debugEngine.setTeachingMode(true);
+            
+            const result = await debugEngine.teachingStep('comparing', {
+                value1: 5,
+                value2: 2,
+                pos1: 0,
+                pos2: 1
+            });
+            log(`   教学步骤返回: ${result}`, result ? 'success' : 'error');
+            
+            log('\n2. 测试比较方法', 'info');
+            const compareResult = await debugEngine.compare(0, 1);
+            log(`   比较结果: ${compareResult}`, 'info');
+            
+            log('\n3. 测试交换方法', 'info');
+            await debugEngine.swap(0, 1);
+            
+            log('\n✅ 逐步测试完成', 'success');
+        }
+        
+        // 初始化
+        window.addEventListener('load', async () => {
+            log('🚀 页面加载完成，初始化调试环境', 'info');
+            debugEngine.visualizer.renderArray(debugEngine.array);
+            log('📋 调试环境已准备就绪', 'success');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>八大排序算法可视化</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .test-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .btn {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 10px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(74, 158, 255, 0.3);
+            margin: 5px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+        }
+        select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #ffffff;
+            padding: 8px 12px;
+            font-size: 14px;
+            margin: 5px;
+        }
+        select option {
+            background: #1a1a2e;
+            color: #ffffff;
+        }
+        .status-display {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid #28a745;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .test-elements {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .element-group {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #4a9eff;
+        }
+        .element-group h4 {
+            color: #4a9eff;
+            margin: 0 0 10px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Language Toggle Verification Test</h1>
+    
+    <div class="test-panel">
+        <h2>Language Control</h2>
+        <button id="language-toggle" class="btn btn-secondary">
+            <span>🌐</span>
+            <span id="language-text">中文</span>
+        </button>
+        
+        <div class="status-display" id="language-status">
+            Current Language: zh<br>
+            Page Title: 八大排序算法可视化<br>
+            Status: Initializing...
+        </div>
+    </div>
+    
+    <div class="test-panel">
+        <h2>Elements to Test Translation</h2>
+        
+        <div class="test-elements">
+            <div class="element-group">
+                <h4>Control Labels</h4>
+                <label for="algorithm-select">排序算法:</label><br>
+                <label for="array-size">数组大小:</label><br>
+                <label for="sort-speed">排序速度:</label><br>
+                <label for="display-mode">显示模式:</label>
+            </div>
+            
+            <div class="element-group">
+                <h4>Algorithm Selection</h4>
+                <select id="algorithm-select">
+                    <option value="bubbleSort">冒泡排序</option>
+                    <option value="selectionSort">选择排序</option>
+                    <option value="insertionSort">插入排序</option>
+                    <option value="mergeSort">归并排序</option>
+                    <option value="quickSort">快速排序</option>
+                    <option value="heapSort">堆排序</option>
+                    <option value="countingSort">计数排序</option>
+                    <option value="radixSort">基数排序</option>
+                </select>
+            </div>
+            
+            <div class="element-group">
+                <h4>Display Mode</h4>
+                <select id="display-mode">
+                    <option value="steps">步骤说明</option>
+                    <option value="code">带注释的代码</option>
+                </select>
+            </div>
+            
+            <div class="element-group">
+                <h4>Action Buttons</h4>
+                <button id="generate-array" class="btn">
+                    <span>🎲</span>
+                    <span>生成新数组</span>
+                </button><br>
+                <button id="start-sort" class="btn">
+                    <span>▶️</span>
+                    <span>开始排序</span>
+                </button><br>
+                <button id="reset-sort" class="btn">
+                    <span>🔄</span>
+                    <span>重置</span>
+                </button>
+            </div>
+            
+            <div class="element-group">
+                <h4>Info Panel Titles</h4>
+                <h3 id="algorithm-info-title">算法信息</h3>
+                <h3 id="stats-title">实时统计</h3>
+                <h3 id="code-title">算法代码</h3>
+                <h3 id="steps-title">当前步骤</h3>
+            </div>
+            
+            <div class="element-group">
+                <h4>Default Messages</h4>
+                <p id="algorithm-description">请选择一个排序算法查看详细信息。</p>
+                <div id="current-step">准备开始排序...</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-panel">
+        <h2>Test Actions</h2>
+        <button onclick="testLanguageToggle()" class="btn">Test Language Toggle</button>
+        <button onclick="testUpdateAllTexts()" class="btn">Test Update All Texts</button>
+        <button onclick="resetToDefault()" class="btn">Reset to Default</button>
+    </div>
+
+    <script src="language-manager.js"></script>
+    <script>
+        function updateLanguageStatus() {
+            const statusElement = document.getElementById('language-status');
+            const currentLang = window.languageManager ? window.languageManager.getCurrentLanguage() : 'unknown';
+            const pageTitle = document.title;
+            const managerStatus = window.languageManager ? 'Ready' : 'Not Found';
+            
+            if (statusElement) {
+                statusElement.innerHTML = `
+                    Current Language: <strong>${currentLang}</strong><br>
+                    Page Title: <strong>${pageTitle}</strong><br>
+                    Language Manager: <strong>${managerStatus}</strong><br>
+                    Last Updated: ${new Date().toLocaleTimeString()}
+                `;
+            }
+        }
+        
+        function testLanguageToggle() {
+            if (window.languageManager) {
+                console.log('Testing language toggle...');
+                window.languageManager.toggleLanguage();
+            } else {
+                alert('Language manager not found!');
+            }
+        }
+        
+        function testUpdateAllTexts() {
+            if (window.languageManager) {
+                console.log('Testing updateAllTexts...');
+                window.languageManager.updateAllTexts();
+                updateLanguageStatus();
+            } else {
+                alert('Language manager not found!');
+            }
+        }
+        
+        function resetToDefault() {
+            if (window.languageManager) {
+                window.languageManager.setLanguage('zh');
+                updateLanguageStatus();
+            }
+        }
+        
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, initializing test...');
+            
+            // Wait a bit for language manager to initialize
+            setTimeout(() => {
+                updateLanguageStatus();
+                
+                // Listen for language change events
+                document.addEventListener('languageChanged', (event) => {
+                    console.log('Language changed event received:', event.detail);
+                    updateLanguageStatus();
+                });
+                
+                // Test button click detection
+                const languageToggle = document.getElementById('language-toggle');
+                if (languageToggle) {
+                    languageToggle.addEventListener('click', () => {
+                        console.log('Language toggle button clicked (test listener)');
+                    });
+                }
+            }, 200);
+        });
+        
+        // Update status every 5 seconds
+        setInterval(updateLanguageStatus, 5000);
+    </script>
+</body>
+</html>

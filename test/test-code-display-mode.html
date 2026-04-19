@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>代码显示模式测试</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .test-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 10px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(74, 158, 255, 0.3);
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+        }
+        
+        select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #ffffff;
+            padding: 8px 12px;
+            font-size: 14px;
+            margin: 5px;
+        }
+        
+        .status-panel {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #4a9eff;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .current-step {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #4a9eff;
+            min-height: 100px;
+        }
+        
+        /* 详细步骤说明的高亮样式 */
+        .current-step .highlight-value {
+            color: #ffc107;
+            font-weight: bold;
+            background: rgba(255, 193, 7, 0.2);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        .current-step .highlight-index {
+            color: #28a745;
+            font-weight: bold;
+            background: rgba(40, 167, 69, 0.2);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>📱 代码显示模式测试</h1>
+        
+        <div class="status-panel">
+            <h3>📋 测试说明</h3>
+            <p>本页面用于测试新的代码显示模式功能：</p>
+            <ul>
+                <li>✅ 在代码模式下显示当前执行的代码行</li>
+                <li>✅ 显示代码解释说明</li>
+                <li>✅ 不同显示模式的切换</li>
+                <li>✅ 代码行格式化和高亮</li>
+            </ul>
+        </div>
+        
+        <div class="test-grid">
+            <!-- 显示模式控制 -->
+            <div class="status-panel">
+                <h3>🎛️ 显示模式控制</h3>
+                <select id="display-mode">
+                    <option value="chinese">中文步骤说明</option>
+                    <option value="english">英文步骤说明</option>
+                    <option value="code">带注释代码</option>
+                </select>
+                <div style="margin-top: 10px;">
+                    <p><strong>当前模式:</strong> <span id="current-mode">chinese</span></p>
+                    <p><strong>模式说明:</strong> <span id="mode-description">显示中文步骤说明</span></p>
+                </div>
+            </div>
+            
+            <!-- 测试按钮 -->
+            <div class="status-panel">
+                <h3>🧪 测试操作</h3>
+                <button onclick="testCodeDisplay()" class="btn btn-success">测试代码显示</button>
+                <button onclick="testStepDisplay()" class="btn btn-warning">测试步骤显示</button>
+                <button onclick="simulateSorting()" class="btn">模拟排序过程</button>
+                <button onclick="clearDisplay()" class="btn">清除显示</button>
+            </div>
+        </div>
+        
+        <!-- 步骤显示区域 -->
+        <div class="status-panel">
+            <h3>📺 当前步骤显示</h3>
+            <div class="current-step" id="current-step">
+                准备开始测试...
+            </div>
+        </div>
+        
+        <!-- 测试结果 -->
+        <div class="status-panel">
+            <h3>📊 测试结果</h3>
+            <div id="test-results">
+                <p>点击上方按钮开始测试</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="language-manager.js"></script>
+    <script>
+        // 模拟UI处理器的显示模式
+        window.uiHandler = {
+            displayMode: 'chinese',
+            changeDisplayMode: function(mode) {
+                this.displayMode = mode;
+                document.getElementById('current-mode').textContent = mode;
+                
+                const descriptions = {
+                    'chinese': '显示中文步骤说明',
+                    'english': '显示英文步骤说明',
+                    'code': '显示当前执行的代码行'
+                };
+                
+                document.getElementById('mode-description').textContent = descriptions[mode] || '未知模式';
+                
+                // 更新当前步骤显示
+                updateCurrentStepDisplay();
+            }
+        };
+        
+        // 模拟可视化器的更新方法
+        function updateCurrentStep(step, codeLine = '', codeExplanation = '') {
+            const stepElement = document.getElementById('current-step');
+            if (!stepElement) return;
+            
+            const displayMode = window.uiHandler.displayMode;
+            
+            switch (displayMode) {
+                case 'code':
+                    // 代码模式 - 显示当前执行的代码行
+                    if (codeLine) {
+                        stepElement.innerHTML = `
+                            <div style="font-family: monospace; font-size: 14px; line-height: 1.6; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 8px; border-left: 4px solid #ffc107;">
+                                <div style="color: #ffc107; font-weight: bold; margin-bottom: 8px;">正在执行:</div>
+                                <div style="color: #ffffff; background: rgba(255,193,7,0.1); padding: 8px; border-radius: 4px; font-family: 'Consolas', 'Monaco', monospace;">
+                                    ${codeLine}
+                                </div>
+                                ${codeExplanation ? `
+                                    <div style="color: #b0b0b0; font-size: 12px; margin-top: 10px; font-family: 'Segoe UI', sans-serif;">
+                                        <strong>说明:</strong> ${codeExplanation}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    } else {
+                        stepElement.innerHTML = `
+                            <div style="font-family: monospace; font-size: 14px; line-height: 1.6; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 8px; border-left: 4px solid #4a9eff;">
+                                <div style="color: #4a9eff; font-weight: bold;">代码显示模式</div>
+                                <div style="color: #b0b0b0; margin-top: 8px;">等待排序开始，将显示当前执行的代码行...</div>
+                            </div>
+                        `;
+                    }
+                    break;
+                    
+                default:
+                    // 默认模式 - 显示步骤描述
+                    stepElement.innerHTML = step;
+            }
+        }
+        
+        function updateCurrentStepDisplay() {
+            const mode = window.uiHandler.displayMode;
+            if (mode === 'code') {
+                updateCurrentStep('', '', '');
+            } else {
+                updateCurrentStep('当前显示模式: ' + mode);
+            }
+        }
+        
+        function testCodeDisplay() {
+            console.log('测试代码显示功能');
+            
+            // 切换到代码模式
+            window.uiHandler.changeDisplayMode('code');
+            document.getElementById('display-mode').value = 'code';
+            
+            // 模拟显示不同的代码行
+            const testCodes = [
+                {
+                    code: 'if (arr[j] > arr[j + 1]) {',
+                    explanation: '比较相邻元素的大小'
+                },
+                {
+                    code: '[arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];',
+                    explanation: '交换两个元素的位置'
+                },
+                {
+                    code: 'let current = arr[i];',
+                    explanation: '提取当前要插入的元素'
+                },
+                {
+                    code: 'const pivot = arr[high];',
+                    explanation: '选择基准元素进行分区'
+                }
+            ];
+            
+            let index = 0;
+            const interval = setInterval(() => {
+                if (index < testCodes.length) {
+                    const testCode = testCodes[index];
+                    updateCurrentStep('', testCode.code, testCode.explanation);
+                    index++;
+                } else {
+                    clearInterval(interval);
+                    document.getElementById('test-results').innerHTML = `
+                        <p>✅ 代码显示测试完成</p>
+                        <p>测试了 ${testCodes.length} 个代码行的显示</p>
+                    `;
+                }
+            }, 2000);
+        }
+        
+        function testStepDisplay() {
+            console.log('测试步骤显示功能');
+            
+            // 切换到中文模式
+            window.uiHandler.changeDisplayMode('chinese');
+            document.getElementById('display-mode').value = 'chinese';
+            
+            // 模拟显示不同的步骤
+            const testSteps = [
+                '比较: <span class="highlight-value">45</span>（位置<span class="highlight-index">3</span>）与 <span class="highlight-value">23</span>（位置<span class="highlight-index">4</span>）',
+                '交换: <span class="highlight-value">45</span> 和 <span class="highlight-value">23</span> 的位置',
+                '提取索引<span class="highlight-index">2</span>的值<span class="highlight-value">67</span>，准备插入到左侧有序区间',
+                '选择基准值<span class="highlight-value">34</span>，开始分区操作'
+            ];
+            
+            let index = 0;
+            const interval = setInterval(() => {
+                if (index < testSteps.length) {
+                    updateCurrentStep(testSteps[index]);
+                    index++;
+                } else {
+                    clearInterval(interval);
+                    document.getElementById('test-results').innerHTML = `
+                        <p>✅ 步骤显示测试完成</p>
+                        <p>测试了 ${testSteps.length} 个步骤的显示</p>
+                    `;
+                }
+            }, 2000);
+        }
+        
+        function simulateSorting() {
+            console.log('模拟排序过程');
+            
+            const steps = [
+                {
+                    mode: 'chinese',
+                    step: '开始冒泡排序...',
+                    code: '',
+                    explanation: ''
+                },
+                {
+                    mode: 'code',
+                    step: '',
+                    code: 'for (let i = 0; i < n - 1; i++) {',
+                    explanation: '外层循环，控制排序轮数'
+                },
+                {
+                    mode: 'code',
+                    step: '',
+                    code: 'for (let j = 0; j < n - i - 1; j++) {',
+                    explanation: '内层循环，进行相邻元素比较'
+                },
+                {
+                    mode: 'code',
+                    step: '',
+                    code: 'if (arr[j] > arr[j + 1]) {',
+                    explanation: '比较相邻元素的大小'
+                },
+                {
+                    mode: 'code',
+                    step: '',
+                    code: '[arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];',
+                    explanation: '交换两个元素的位置'
+                },
+                {
+                    mode: 'chinese',
+                    step: '冒泡排序完成！',
+                    code: '',
+                    explanation: ''
+                }
+            ];
+            
+            let index = 0;
+            const interval = setInterval(() => {
+                if (index < steps.length) {
+                    const step = steps[index];
+                    window.uiHandler.changeDisplayMode(step.mode);
+                    document.getElementById('display-mode').value = step.mode;
+                    updateCurrentStep(step.step, step.code, step.explanation);
+                    index++;
+                } else {
+                    clearInterval(interval);
+                    document.getElementById('test-results').innerHTML = `
+                        <p>✅ 排序模拟测试完成</p>
+                        <p>模拟了完整的排序过程，包含 ${steps.length} 个步骤</p>
+                        <p>展示了中文说明和代码行的切换显示</p>
+                    `;
+                }
+            }, 3000);
+        }
+        
+        function clearDisplay() {
+            updateCurrentStep('准备开始测试...');
+            document.getElementById('test-results').innerHTML = '<p>点击上方按钮开始测试</p>';
+        }
+        
+        // 页面初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('代码显示模式测试页面加载完成');
+            
+            // 绑定显示模式切换事件
+            const displayMode = document.getElementById('display-mode');
+            if (displayMode) {
+                displayMode.addEventListener('change', (e) => {
+                    console.log('显示模式切换:', e.target.value);
+                    window.uiHandler.changeDisplayMode(e.target.value);
+                });
+            }
+            
+            updateCurrentStepDisplay();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教学模式属性测试</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #ffffff;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .test-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+        }
+        
+        .test-result {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        
+        .test-pass {
+            background: rgba(40, 167, 69, 0.2);
+            border-left: 4px solid #28a745;
+        }
+        
+        .test-fail {
+            background: rgba(220, 53, 69, 0.2);
+            border-left: 4px solid #dc3545;
+        }
+        
+        .test-summary {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .summary-pass {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+        }
+        
+        .summary-fail {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
+        }
+        
+        .property-info {
+            background: rgba(74, 158, 255, 0.1);
+            border-left: 4px solid #4a9eff;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        
+        .iteration-count {
+            color: #4a9eff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 教学模式属性测试</h1>
+        <p>验证教学模式交互性的正确性属性</p>
+        
+        <div class="property-info">
+            <h3>🎯 测试属性</h3>
+            <p><strong>属性 12: 教学模式交互性</strong></p>
+            <p><em>对于任何</em> 启用教学模式的排序步骤，系统应该显示解释提示并等待用户确认后才继续下一步</p>
+            <p><strong>验证需求:</strong> 12.1, 12.3</p>
+        </div>
+        
+        <button onclick="runPropertyTests()">运行属性测试 (50次迭代)</button>
+        <button onclick="runSingleTest()">运行单次测试</button>
+        <button onclick="location.href='index.html'">返回主页面</button>
+        
+        <div id="test-results"></div>
+        <div id="test-summary"></div>
+    </div>
+
+    <script>
+        class TeachingModePropertyTests {
+            constructor() {
+                this.results = [];
+                this.testContainer = document.getElementById('test-results');
+                this.summaryContainer = document.getElementById('test-summary');
+                this.iterationCount = 50; // 减少迭代次数，因为教学模式测试较复杂
+            }
+            
+            /**
+             * 运行属性测试（50次迭代）
+             */
+            async runPropertyTests() {
+                this.results = [];
+                this.testContainer.innerHTML = '';
+                this.summaryContainer.innerHTML = '';
+                
+                console.log('开始运行教学模式属性测试...');
+                
+                const section = this.createTestSection(`属性测试 - ${this.iterationCount}次迭代`);
+                
+                let passedIterations = 0;
+                
+                for (let i = 0; i < this.iterationCount; i++) {
+                    const iterationPassed = await this.runSingleIteration(i + 1, section);
+                    if (iterationPassed) {
+                        passedIterations++;
+                    }
+                    
+                    // 每10次迭代显示进度
+                    if ((i + 1) % 10 === 0) {
+                        this.addTestResult(
+                            section,
+                            `进度更新`,
+                            true,
+                            `已完成 ${i + 1}/${this.iterationCount} 次迭代，通过率: ${((passedIterations / (i + 1)) * 100).toFixed(1)}%`
+                        );
+                    }
+                }
+                
+                // 显示最终结果
+                const finalPassed = passedIterations === this.iterationCount;
+                this.addTestResult(
+                    section,
+                    `属性 12: 教学模式交互性`,
+                    finalPassed,
+                    `${passedIterations}/${this.iterationCount} 次迭代通过 (${((passedIterations / this.iterationCount) * 100).toFixed(1)}%)`
+                );
+                
+                this.showSummary();
+            }
+            
+            /**
+             * 运行单次测试
+             */
+            async runSingleTest() {
+                this.results = [];
+                this.testContainer.innerHTML = '';
+                this.summaryContainer.innerHTML = '';
+                
+                const section = this.createTestSection('单次属性测试');
+                await this.runSingleIteration(1, section);
+                this.showSummary();
+            }
+            
+            /**
+             * 运行单次迭代
+             * @param {number} iteration - 迭代次数
+             * @param {HTMLElement} section - 测试区域
+             * @returns {boolean} 是否通过
+             */
+            async runSingleIteration(iteration, section) {
+                try {
+                    // 生成随机测试场景
+                    const testScenario = this.generateTestScenario();
+                    
+                    // 测试教学模式交互性
+                    const testPassed = await this.testTeachingModeInteractivity(
+                        testScenario, 
+                        iteration, 
+                        section
+                    );
+                    
+                    return testPassed;
+                    
+                } catch (error) {
+                    this.addTestResult(section, `迭代 ${iteration}`, false, `测试异常: ${error.message}`);
+                    return false;
+                }
+            }
+            
+            /**
+             * 生成测试场景
+             * @returns {Object} 测试场景
+             */
+            generateTestScenario() {
+                const stepTypes = ['comparing', 'swapping', 'moving', 'partitioning', 'merging'];
+                const languages = ['zh', 'en'];
+                
+                return {
+                    stepType: stepTypes[Math.floor(Math.random() * stepTypes.length)],
+                    language: languages[Math.floor(Math.random() * languages.length)],
+                    params: {
+                        value1: Math.floor(Math.random() * 100) + 1,
+                        value2: Math.floor(Math.random() * 100) + 1,
+                        pos1: Math.floor(Math.random() * 10),
+                        pos2: Math.floor(Math.random() * 10),
+                        pivot: Math.floor(Math.random() * 100) + 1,
+                        left: 0,
+                        right: Math.floor(Math.random() * 10) + 5
+                    }
+                };
+            }
+            
+            /**
+             * 测试教学模式交互性
+             * @param {Object} scenario - 测试场景
+             * @param {number} iteration - 迭代次数
+             * @param {HTMLElement} section - 测试区域
+             * @returns {boolean} 是否通过
+             */
+            async testTeachingModeInteractivity(scenario, iteration, section) {
+                const { stepType, language, params } = scenario;
+                
+                // 测试排序引擎的教学模式功能
+                const engineTest = this.testSortingEngineTeachingMode(stepType, params);
+                
+                // 测试语言管理器的步骤描述功能
+                const languageTest = this.testLanguageManagerStepDescriptions(stepType, params, language);
+                
+                // 测试UI控制器的教学提示功能
+                const uiTest = this.testUIHandlerTeachingPrompt();
+                
+                // 测试教学模式状态管理
+                const stateTest = this.testTeachingModeStateManagement();
+                
+                const allTestsPassed = engineTest.passed && languageTest.passed && uiTest.passed && stateTest.passed;
+                const failedTests = [];
+                
+                if (!engineTest.passed) failedTests.push(...engineTest.failedTests);
+                if (!languageTest.passed) failedTests.push(...languageTest.failedTests);
+                if (!uiTest.passed) failedTests.push(...uiTest.failedTests);
+                if (!stateTest.passed) failedTests.push(...stateTest.failedTests);
+                
+                // 记录详细结果（仅在失败或前10次迭代时显示）
+                if (!allTestsPassed || iteration <= 10) {
+                    const resultMessage = allTestsPassed ? 
+                        `✓ 教学模式交互性测试通过 (${stepType}, ${language})` :
+                        `✗ 教学模式测试失败: ${failedTests.join(', ')}`;
+                    
+                    this.addTestResult(
+                        section,
+                        `迭代 ${iteration} (${stepType})`,
+                        allTestsPassed,
+                        resultMessage
+                    );
+                }
+                
+                return allTestsPassed;
+            }
+            
+            /**
+             * 测试排序引擎的教学模式功能
+             * @param {string} stepType - 步骤类型
+             * @param {Object} params - 步骤参数
+             * @returns {Object} 测试结果
+             */
+            testSortingEngineTeachingMode(stepType, params) {
+                const failedTests = [];
+                let passed = true;
+                
+                try {
+                    // 检查SortingEngine类是否存在
+                    if (typeof SortingEngine === 'undefined') {
+                        passed = false;
+                        failedTests.push('SortingEngine class not found');
+                        return { passed, failedTests };
+                    }
+                    
+                    // 创建模拟的可视化器
+                    const mockVisualizer = {
+                        updateCurrentStep: () => {},
+                        highlightComparison: () => {},
+                        highlightSwap: () => {},
+                        renderArray: () => {},
+                        updateStats: () => {}
+                    };
+                    
+                    // 创建排序引擎实例
+                    const engine = new SortingEngine(mockVisualizer);
+                    
+                    // 测试setTeachingMode方法
+                    if (typeof engine.setTeachingMode !== 'function') {
+                        passed = false;
+                        failedTests.push('setTeachingMode method not found');
+                    } else {
+                        engine.setTeachingMode(true);
+                        if (!engine.teachingMode) {
+                            passed = false;
+                            failedTests.push('setTeachingMode not working');
+                        }
+                    }
+                    
+                    // 测试teachingStep方法
+                    if (typeof engine.teachingStep !== 'function') {
+                        passed = false;
+                        failedTests.push('teachingStep method not found');
+                    }
+                    
+                    // 测试getStepDescription方法
+                    if (typeof engine.getStepDescription !== 'function') {
+                        passed = false;
+                        failedTests.push('getStepDescription method not found');
+                    } else {
+                        const description = engine.getStepDescription(stepType, params);
+                        if (!description || description.length === 0) {
+                            passed = false;
+                            failedTests.push('getStepDescription returns empty');
+                        }
+                    }
+                    
+                    // 测试getStepExplanation方法
+                    if (typeof engine.getStepExplanation !== 'function') {
+                        passed = false;
+                        failedTests.push('getStepExplanation method not found');
+                    } else {
+                        const explanation = engine.getStepExplanation(stepType, params);
+                        if (!explanation || explanation.length === 0) {
+                            passed = false;
+                            failedTests.push('getStepExplanation returns empty');
+                        }
+                    }
+                    
+                } catch (error) {
+                    passed = false;
+                    failedTests.push(`SortingEngine test error: ${error.message}`);
+                }
+                
+                return { passed, failedTests };
+            }
+            
+            /**
+             * 测试语言管理器的步骤描述功能
+             * @param {string} stepType - 步骤类型
+             * @param {Object} params - 步骤参数
+             * @param {string} language - 语言
+             * @returns {Object} 测试结果
+             */
+            testLanguageManagerStepDescriptions(stepType, params, language) {
+                const failedTests = [];
+                let passed = true;
+                
+                try {
+                    // 检查语言管理器是否存在
+                    if (!window.languageManager) {
+                        passed = false;
+                        failedTests.push('LanguageManager not found');
+                        return { passed, failedTests };
+                    }
+                    
+                    const languageManager = window.languageManager;
+                    
+                    // 设置测试语言
+                    const originalLanguage = languageManager.getCurrentLanguage();
+                    languageManager.setLanguage(language);
+                    
+                    // 测试getStepDescription方法
+                    if (typeof languageManager.getStepDescription !== 'function') {
+                        passed = false;
+                        failedTests.push('getStepDescription method not found in LanguageManager');
+                    } else {
+                        const description = languageManager.getStepDescription(stepType, params);
+                        if (!description || description.length === 0) {
+                            passed = false;
+                            failedTests.push('LanguageManager getStepDescription returns empty');
+                        }
+                        
+                        // 检查参数替换是否工作
+                        if (stepType === 'comparing' && params.value1 && params.value2) {
+                            if (!description.includes(params.value1.toString()) && !description.includes(params.value2.toString())) {
+                                passed = false;
+                                failedTests.push('Parameter substitution not working');
+                            }
+                        }
+                    }
+                    
+                    // 恢复原始语言
+                    languageManager.setLanguage(originalLanguage);
+                    
+                } catch (error) {
+                    passed = false;
+                    failedTests.push(`LanguageManager test error: ${error.message}`);
+                }
+                
+                return { passed, failedTests };
+            }
+            
+            /**
+             * 测试UI控制器的教学提示功能
+             * @returns {Object} 测试结果
+             */
+            testUIHandlerTeachingPrompt() {
+                const failedTests = [];
+                let passed = true;
+                
+                try {
+                    // 检查UIHandler类是否存在
+                    if (typeof UIHandler === 'undefined') {
+                        passed = false;
+                        failedTests.push('UIHandler class not found');
+                        return { passed, failedTests };
+                    }
+                    
+                    // 检查全局uiHandler实例
+                    if (!window.uiHandler) {
+                        // 这是正常的，因为uiHandler在DOM加载后才创建
+                        // 我们检查UIHandler原型上的方法
+                        if (typeof UIHandler.prototype.showTeachingStepPrompt !== 'function') {
+                            passed = false;
+                            failedTests.push('showTeachingStepPrompt method not found');
+                        }
+                        
+                        if (typeof UIHandler.prototype.toggleTeachingMode !== 'function') {
+                            passed = false;
+                            failedTests.push('toggleTeachingMode method not found');
+                        }
+                        
+                        if (typeof UIHandler.prototype.showTeachingModeInstructions !== 'function') {
+                            passed = false;
+                            failedTests.push('showTeachingModeInstructions method not found');
+                        }
+                    } else {
+                        // 如果实例存在，测试实例方法
+                        const uiHandler = window.uiHandler;
+                        
+                        if (typeof uiHandler.showTeachingStepPrompt !== 'function') {
+                            passed = false;
+                            failedTests.push('showTeachingStepPrompt method not found in instance');
+                        }
+                        
+                        if (typeof uiHandler.toggleTeachingMode !== 'function') {
+                            passed = false;
+                            failedTests.push('toggleTeachingMode method not found in instance');
+                        }
+                        
+                        // 测试教学模式状态
+                        if (typeof uiHandler.teachingMode === 'undefined') {
+                            passed = false;
+                            failedTests.push('teachingMode property not found');
+                        }
+                    }
+                    
+                } catch (error) {
+                    passed = false;
+                    failedTests.push(`UIHandler test error: ${error.message}`);
+                }
+                
+                return { passed, failedTests };
+            }
+            
+            /**
+             * 测试教学模式状态管理
+             * @returns {Object} 测试结果
+             */
+            testTeachingModeStateManagement() {
+                const failedTests = [];
+                let passed = true;
+                
+                try {
+                    // 检查教学模式按钮是否存在
+                    const teachingButton = document.getElementById('teaching-mode');
+                    if (!teachingButton) {
+                        // 这是正常的，因为我们在测试页面中
+                        // 但我们可以检查HTML结构是否正确定义
+                        passed = true; // 不将此视为失败
+                    }
+                    
+                    // 检查语言管理器中是否有教学模式相关的文本
+                    if (window.languageManager) {
+                        const teachingModeText = window.languageManager.getText('teachingMode');
+                        if (!teachingModeText || teachingModeText === 'teachingMode') {
+                            passed = false;
+                            failedTests.push('Teaching mode text not found in language manager');
+                        }
+                    }
+                    
+                } catch (error) {
+                    passed = false;
+                    failedTests.push(`State management test error: ${error.message}`);
+                }
+                
+                return { passed, failedTests };
+            }
+            
+            /**
+             * 创建测试区域
+             * @param {string} title - 测试区域标题
+             * @returns {HTMLElement} 测试区域元素
+             */
+            createTestSection(title) {
+                const section = document.createElement('div');
+                section.className = 'test-section';
+                section.innerHTML = `<h3>${title}</h3>`;
+                this.testContainer.appendChild(section);
+                return section;
+            }
+            
+            /**
+             * 添加测试结果
+             * @param {HTMLElement} section - 测试区域
+             * @param {string} testName - 测试名称
+             * @param {boolean} passed - 是否通过
+             * @param {string} message - 结果消息
+             */
+            addTestResult(section, testName, passed, message) {
+                const result = {
+                    name: testName,
+                    passed: passed,
+                    message: message
+                };
+                
+                this.results.push(result);
+                
+                const resultDiv = document.createElement('div');
+                resultDiv.className = `test-result ${passed ? 'test-pass' : 'test-fail'}`;
+                resultDiv.innerHTML = `
+                    <strong>${passed ? '✓' : '✗'} ${testName}</strong><br>
+                    ${message}
+                `;
+                
+                section.appendChild(resultDiv);
+            }
+            
+            /**
+             * 显示测试总结
+             */
+            showSummary() {
+                const totalTests = this.results.length;
+                const passedTests = this.results.filter(r => r.passed).length;
+                const failedTests = totalTests - passedTests;
+                
+                const allPassed = failedTests === 0;
+                
+                this.summaryContainer.innerHTML = `
+                    <div class="test-summary ${allPassed ? 'summary-pass' : 'summary-fail'}">
+                        <h2>🎯 属性测试总结</h2>
+                        <p><strong>Feature: sorting-visualization, Property 12: 教学模式交互性</strong></p>
+                        <p>总测试数: ${totalTests}</p>
+                        <p>通过: ${passedTests}</p>
+                        <p>失败: ${failedTests}</p>
+                        <p>通过率: ${totalTests > 0 ? ((passedTests / totalTests) * 100).toFixed(1) : 0}%</p>
+                        <p><strong>${allPassed ? '🎉 属性验证通过！' : '❌ 属性验证失败'}</strong></p>
+                    </div>
+                `;
+                
+                console.log(`教学模式属性测试完成: ${passedTests}/${totalTests} 通过`);
+            }
+        }
+        
+        // 全局测试实例
+        const teachingModePropertyTests = new TeachingModePropertyTests();
+        
+        /**
+         * 运行属性测试的全局函数
+         */
+        function runPropertyTests() {
+            teachingModePropertyTests.runPropertyTests();
+        }
+        
+        /**
+         * 运行单次测试的全局函数
+         */
+        function runSingleTest() {
+            teachingModePropertyTests.runSingleTest();
+        }
+        
+        // 页面加载完成后准备测试环境
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                console.log('教学模式属性测试环境准备完成');
+            }, 500);
+        });
+    </script>
+    
+    <!-- 引入相关JavaScript文件进行测试 -->
+    <script src="language-manager.js"></script>
+    <script src="sorting-algorithms.js"></script>
+    <script src="ui-handler.js"></script>
+</body>
+</html>

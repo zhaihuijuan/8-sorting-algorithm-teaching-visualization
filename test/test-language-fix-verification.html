@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>八大排序算法可视化</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
+            color: white;
+            padding: 20px;
+        }
+        .test-container {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .btn {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 10px 16px;
+            cursor: pointer;
+            margin: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        }
+        select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #ffffff;
+            padding: 8px 12px;
+            margin: 5px;
+        }
+        .status {
+            background: rgba(0,255,0,0.2);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="page-title">八大排序算法可视化</h1>
+    
+    <div class="test-container">
+        <h2>Language Toggle Test</h2>
+        
+        <!-- Language Toggle Button (same structure as main app) -->
+        <button id="language-toggle" class="btn btn-secondary">
+            <span>🌐</span>
+            <span id="language-text">中文</span>
+        </button>
+        
+        <div class="status" id="status">
+            Current Language: zh<br>
+            Page Title: 八大排序算法可视化
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <h2>Sample Elements to Test Translation</h2>
+        
+        <div style="margin: 10px 0;">
+            <label for="algorithm-select">排序算法:</label>
+            <select id="algorithm-select">
+                <option value="bubbleSort">冒泡排序</option>
+                <option value="selectionSort">选择排序</option>
+                <option value="insertionSort">插入排序</option>
+                <option value="mergeSort">归并排序</option>
+            </select>
+        </div>
+        
+        <div style="margin: 10px 0;">
+            <label for="array-size">数组大小:</label>
+            <input type="range" id="array-size" min="5" max="100" value="30">
+        </div>
+        
+        <div style="margin: 10px 0;">
+            <button id="start-sort" class="btn">
+                <span>▶️</span>
+                <span>开始排序</span>
+            </button>
+            
+            <button id="reset-sort" class="btn">
+                <span>🔄</span>
+                <span>重置</span>
+            </button>
+        </div>
+        
+        <div style="margin: 10px 0;">
+            <h3 id="algorithm-info-title">算法信息</h3>
+            <h3 id="stats-title">实时统计</h3>
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <h2>Debug Log</h2>
+        <div id="debug-log" style="background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px; font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto;"></div>
+    </div>
+
+    <script src="language-manager.js"></script>
+    <script>
+        let debugMessages = [];
+        
+        function addDebugMessage(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            debugMessages.push(`[${timestamp}] ${message}`);
+            updateDebugLog();
+            console.log(message);
+        }
+        
+        function updateDebugLog() {
+            const logElement = document.getElementById('debug-log');
+            if (logElement) {
+                logElement.innerHTML = debugMessages.join('<br>');
+                logElement.scrollTop = logElement.scrollHeight;
+            }
+        }
+        
+        function updateStatus() {
+            const statusElement = document.getElementById('status');
+            const currentLang = window.languageManager ? window.languageManager.getCurrentLanguage() : 'unknown';
+            const pageTitle = document.title;
+            
+            if (statusElement) {
+                statusElement.innerHTML = `
+                    Current Language: ${currentLang}<br>
+                    Page Title: ${pageTitle}<br>
+                    Language Manager: ${window.languageManager ? 'Ready' : 'Not Found'}
+                `;
+            }
+        }
+        
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            addDebugMessage('DOM Content Loaded');
+            
+            // Check if language manager is available
+            if (window.languageManager) {
+                addDebugMessage('✓ Language manager found');
+                updateStatus();
+            } else {
+                addDebugMessage('✗ Language manager not found');
+            }
+            
+            // Listen for language change events
+            document.addEventListener('languageChanged', (event) => {
+                addDebugMessage(`Language changed: ${event.detail.previousLanguage} → ${event.detail.language}`);
+                updateStatus();
+            });
+            
+            // Test button click detection
+            const languageToggle = document.getElementById('language-toggle');
+            if (languageToggle) {
+                languageToggle.addEventListener('click', () => {
+                    addDebugMessage('Language toggle button clicked (test listener)');
+                });
+            }
+        });
+        
+        // Update status every 3 seconds
+        setInterval(updateStatus, 3000);
+        
+        addDebugMessage('Test page initialized');
+    </script>
+</body>
+</html>

@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>完整翻译功能测试</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .test-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4a9eff;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        /* 页面标题样式 */
+        .page-header {
+            text-align: center;
+            padding: 20px 0 10px 0;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #4a9eff 0%, #20c997 50%, #ffc107 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 10px rgba(74, 158, 255, 0.3);
+            margin: 0;
+            letter-spacing: 1px;
+        }
+
+        /* 主容器布局 */
+        .main-container {
+            display: grid;
+            grid-template-areas: 
+                "header header"
+                "controls controls"
+                "visualization info"
+                "steps steps";
+            grid-template-rows: auto auto 1fr auto;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            min-height: 80vh;
+        }
+
+        /* 控制面板样式 */
+        .control-panel {
+            grid-area: controls;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-group label {
+            font-size: 14px;
+            color: #b0b0b0;
+            min-width: 80px;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 10px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(74, 158, 255, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        /* 输入控件样式 */
+        select, input[type="range"] {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #ffffff;
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+
+        select option {
+            background: #1a1a2e;
+            color: #ffffff;
+        }
+
+        /* 可视化区域 */
+        .visualization-area {
+            grid-area: visualization;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 信息面板 */
+        .info-panel {
+            grid-area: info;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .info-section {
+            margin-bottom: 25px;
+        }
+
+        .info-section h3 {
+            color: #4a9eff;
+            margin-bottom: 10px;
+            font-size: 16px;
+            border-bottom: 1px solid rgba(74, 158, 255, 0.3);
+            padding-bottom: 5px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #4a9eff;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        /* 步骤面板 */
+        .steps-panel {
+            grid-area: steps;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            min-height: 120px;
+        }
+
+        .steps-panel h3 {
+            color: #4a9eff;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .current-step {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #4a9eff;
+        }
+
+        /* 颜色图例样式 */
+        .color-legend {
+            flex-wrap: wrap;
+        }
+
+        .legend-items {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: #b0b0b0;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .legend-color.waiting {
+            background: linear-gradient(135deg, #87ceeb 0%, #5dade2 100%);
+        }
+
+        .legend-color.comparing {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        }
+
+        .legend-color.moving {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        }
+
+        .legend-color.inserting {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .legend-color.swapping {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .legend-color.completed {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        }
+
+        .legend-color.marked {
+            background: linear-gradient(135deg, #9c27b0 0%, #673ab7 100%);
+        }
+
+        /* 测试状态 */
+        .test-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(40, 167, 69, 0.9);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 1200px) {
+            .main-container {
+                grid-template-areas: 
+                    "header"
+                    "controls"
+                    "visualization"
+                    "info"
+                    "steps";
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto auto auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 24px;
+                letter-spacing: 0.5px;
+            }
+            
+            .control-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🌐 完整翻译功能测试</h1>
+        
+        <!-- 主容器 -->
+        <div class="main-container">
+            <!-- 页面标题 -->
+            <div class="page-header">
+                <h1 class="page-title" id="page-title">八大排序算法可视化</h1>
+            </div>
+
+            <!-- 顶部控制面板 -->
+            <div class="control-panel">
+                <div class="control-row">
+                    <div class="control-group">
+                        <label for="algorithm-select">排序算法:</label>
+                        <select id="algorithm-select">
+                            <option value="bubbleSort">冒泡排序</option>
+                            <option value="selectionSort">选择排序</option>
+                            <option value="insertionSort">插入排序</option>
+                            <option value="mergeSort">归并排序</option>
+                            <option value="quickSort">快速排序</option>
+                            <option value="heapSort">堆排序</option>
+                            <option value="countingSort">计数排序</option>
+                            <option value="radixSort">基数排序</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="array-size">数组大小:</label>
+                        <input type="range" id="array-size" min="5" max="100" value="30">
+                        <span id="array-size-value">30</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="sort-speed">排序速度:</label>
+                        <input type="range" id="sort-speed" min="10" max="200" value="50">
+                        <span id="sort-speed-value">50ms</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <button id="language-toggle" class="btn btn-secondary">
+                            <span>🌐</span>
+                            <span id="language-text">中文</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="control-row">
+                    <div class="control-group">
+                        <label for="display-mode" data-translate="displayModeLabel">显示模式:</label>
+                        <select id="display-mode">
+                            <option value="steps">步骤说明</option>
+                            <option value="code">带注释的代码</option>
+                        </select>
+                    </div>
+                    
+                    <!-- 颜色含义标记 -->
+                    <div class="control-group color-legend">
+                        <label data-translate="colorLegend.title">颜色含义:</label>
+                        <div class="legend-items">
+                            <div class="legend-item">
+                                <div class="legend-color waiting"></div>
+                                <span>待排</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color comparing"></div>
+                                <span>比较</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color moving"></div>
+                                <span>移动</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color inserting"></div>
+                                <span>待插</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color swapping"></div>
+                                <span>交换</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color completed"></div>
+                                <span>完成</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color marked"></div>
+                                <span>标记</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 中间可视化区域 -->
+            <div class="visualization-area">
+                <div style="text-align: center; color: #b0b0b0;">
+                    <h3>可视化区域</h3>
+                    <p>这里将显示排序算法的动画效果</p>
+                </div>
+            </div>
+
+            <!-- 右侧信息面板 -->
+            <div class="info-panel">
+                <div class="info-section">
+                    <h3 id="algorithm-info-title">算法信息</h3>
+                    <div id="algorithm-info-content">
+                        <p><strong id="time-complexity-label">时间复杂度:</strong></p>
+                        <ul>
+                            <li><span id="time-best-label">最好情况:</span> <span id="time-best">-</span></li>
+                            <li><span id="time-average-label">平均情况:</span> <span id="time-average">-</span></li>
+                            <li><span id="time-worst-label">最坏情况:</span> <span id="time-worst">-</span></li>
+                        </ul>
+                        <p><strong id="space-complexity-label">空间复杂度:</strong> <span id="space-complexity">-</span></p>
+                        <p><strong id="stability-label">稳定性:</strong> <span id="stability">-</span></p>
+                        <p id="algorithm-description">请选择一个排序算法查看详细信息。</p>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <h3 id="stats-title">实时统计</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="comparison-count">0</div>
+                            <div class="stat-label">比较次数</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="swap-count">0</div>
+                            <div class="stat-label">交换次数</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="elapsed-time">0ms</div>
+                            <div class="stat-label">耗时</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="sorted-count">0</div>
+                            <div class="stat-label">已排序</div>
+                        </div>
+                    </div>
+                    
+                    <div id="pointers-info" style="margin-top: 15px;">
+                        <p><strong data-translate="stats.pointerPosition">指针位置:</strong></p>
+                        <div id="pointer-values">
+                            <!-- 指针信息将在这里动态显示 -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <h3 id="code-title">算法代码</h3>
+                    <pre id="algorithm-code" style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; font-size: 12px; line-height: 1.4; overflow-x: auto;">
+// 选择一个算法查看代码
+                    </pre>
+                </div>
+            </div>
+
+            <!-- 底部步骤面板 -->
+            <div class="steps-panel">
+                <h3 id="steps-title">当前步骤</h3>
+                <div class="current-step" id="current-step">
+                    准备开始排序...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 测试状态指示器 -->
+    <div class="test-status" id="test-status">
+        ✅ 翻译功能测试就绪
+    </div>
+
+    <!-- 引入语言管理器 -->
+    <script src="language-manager.js"></script>
+    
+    <script>
+        // 页面加载完成后初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('完整翻译功能测试页面加载完成');
+            
+            // 确保语言管理器已初始化
+            if (window.languageManager) {
+                console.log('语言管理器已就绪');
+                
+                // 绑定语言切换按钮
+                const languageToggle = document.getElementById('language-toggle');
+                if (languageToggle) {
+                    languageToggle.addEventListener('click', () => {
+                        console.log('切换语言...');
+                        const oldLang = window.languageManager.getCurrentLanguage();
+                        window.languageManager.toggleLanguage();
+                        const newLang = window.languageManager.getCurrentLanguage();
+                        
+                        // 更新测试状态
+                        const testStatus = document.getElementById('test-status');
+                        testStatus.textContent = `✅ 语言已切换: ${oldLang} → ${newLang}`;
+                        
+                        console.log(`语言切换完成: ${oldLang} → ${newLang}`);
+                    });
+                }
+                
+                // 监听语言切换事件
+                document.addEventListener('languageChanged', (event) => {
+                    console.log('语言切换事件触发:', event.detail);
+                    
+                    const testStatus = document.getElementById('test-status');
+                    testStatus.textContent = `✅ 所有文本已更新为: ${event.detail.language}`;
+                    
+                    // 3秒后恢复默认状态
+                    setTimeout(() => {
+                        testStatus.textContent = '✅ 翻译功能测试就绪';
+                    }, 3000);
+                });
+                
+            } else {
+                console.error('语言管理器未找到');
+                const testStatus = document.getElementById('test-status');
+                testStatus.textContent = '❌ 语言管理器未找到';
+                testStatus.style.background = 'rgba(220, 53, 69, 0.9)';
+            }
+        });
+    </script>
+</body>
+</html>

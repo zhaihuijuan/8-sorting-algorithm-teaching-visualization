@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>语言管理属性测试</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #ffffff;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .test-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+        }
+        
+        .test-result {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        
+        .test-pass {
+            background: rgba(40, 167, 69, 0.2);
+            border-left: 4px solid #28a745;
+        }
+        
+        .test-fail {
+            background: rgba(220, 53, 69, 0.2);
+            border-left: 4px solid #dc3545;
+        }
+        
+        .test-summary {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .summary-pass {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+        }
+        
+        .summary-fail {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
+        }
+        
+        .property-info {
+            background: rgba(74, 158, 255, 0.1);
+            border-left: 4px solid #4a9eff;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        
+        .iteration-count {
+            color: #4a9eff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 语言管理属性测试</h1>
+        <p>验证语言切换完整性的正确性属性</p>
+        
+        <div class="property-info">
+            <h3>🎯 测试属性</h3>
+            <p><strong>属性 10: 语言切换完整性</strong></p>
+            <p><em>对于任何</em> 界面元素，当切换语言时，所有文本内容（按钮标签、步骤说明、算法信息、弹窗内容）都应该更新为目标语言</p>
+            <p><strong>验证需求:</strong> 5.2, 5.3, 5.4, 5.5</p>
+        </div>
+        
+        <button onclick="runPropertyTests()">运行属性测试 (100次迭代)</button>
+        <button onclick="runSingleTest()">运行单次测试</button>
+        <button onclick="location.href='index.html'">返回主页面</button>
+        
+        <div id="test-results"></div>
+        <div id="test-summary"></div>
+    </div>
+
+    <script>
+        class LanguageManagementPropertyTests {
+            constructor() {
+                this.results = [];
+                this.testContainer = document.getElementById('test-results');
+                this.summaryContainer = document.getElementById('test-summary');
+                this.iterationCount = 100;
+            }
+            
+            /**
+             * 运行属性测试（100次迭代）
+             */
+            async runPropertyTests() {
+                this.results = [];
+                this.testContainer.innerHTML = '';
+                this.summaryContainer.innerHTML = '';
+                
+                console.log('开始运行语言管理属性测试...');
+                
+                const section = this.createTestSection(`属性测试 - ${this.iterationCount}次迭代`);
+                
+                let passedIterations = 0;
+                
+                for (let i = 0; i < this.iterationCount; i++) {
+                    const iterationPassed = await this.runSingleIteration(i + 1, section);
+                    if (iterationPassed) {
+                        passedIterations++;
+                    }
+                    
+                    // 每10次迭代显示进度
+                    if ((i + 1) % 10 === 0) {
+                        this.addTestResult(
+                            section,
+                            `进度更新`,
+                            true,
+                            `已完成 ${i + 1}/${this.iterationCount} 次迭代，通过率: ${((passedIterations / (i + 1)) * 100).toFixed(1)}%`
+                        );
+                    }
+                }
+                
+                // 显示最终结果
+                const finalPassed = passedIterations === this.iterationCount;
+                this.addTestResult(
+                    section,
+                    `属性 10: 语言切换完整性`,
+                    finalPassed,
+                    `${passedIterations}/${this.iterationCount} 次迭代通过 (${((passedIterations / this.iterationCount) * 100).toFixed(1)}%)`
+                );
+                
+                this.showSummary();
+            }
+            
+            /**
+             * 运行单次测试
+             */
+            async runSingleTest() {
+                this.results = [];
+                this.testContainer.innerHTML = '';
+                this.summaryContainer.innerHTML = '';
+                
+                const section = this.createTestSection('单次属性测试');
+                await this.runSingleIteration(1, section);
+                this.showSummary();
+            }
+            
+            /**
+             * 运行单次迭代
+             * @param {number} iteration - 迭代次数
+             * @param {HTMLElement} section - 测试区域
+             * @returns {boolean} 是否通过
+             */
+            async runSingleIteration(iteration, section) {
+                try {
+                    // 确保语言管理器存在
+                    if (!window.languageManager) {
+                        this.addTestResult(section, `迭代 ${iteration}`, false, '语言管理器不存在');
+                        return false;
+                    }
+                    
+                    const languageManager = window.languageManager;
+                    
+                    // 记录初始状态
+                    const initialLanguage = languageManager.getCurrentLanguage();
+                    
+                    // 生成随机测试场景
+                    const testScenario = this.generateTestScenario();
+                    
+                    // 测试语言切换完整性
+                    const testPassed = await this.testLanguageSwitchCompleteness(
+                        languageManager, 
+                        testScenario, 
+                        iteration, 
+                        section
+                    );
+                    
+                    // 恢复初始状态
+                    languageManager.setLanguage(initialLanguage);
+                    
+                    return testPassed;
+                    
+                } catch (error) {
+                    this.addTestResult(section, `迭代 ${iteration}`, false, `测试异常: ${error.message}`);
+                    return false;
+                }
+            }
+            
+            /**
+             * 生成测试场景
+             * @returns {Object} 测试场景
+             */
+            generateTestScenario() {
+                const languages = ['zh', 'en'];
+                const textKeys = [
+                    'pageTitle',
+                    'algorithmLabel',
+                    'generateArray',
+                    'startSort',
+                    'algorithms.bubbleSort',
+                    'algorithms.quickSort',
+                    'displayModes.chinese',
+                    'stats.comparisons',
+                    'complexity.stable',
+                    'modal.algorithmIntro'
+                ];
+                
+                return {
+                    startLanguage: languages[Math.floor(Math.random() * languages.length)],
+                    targetLanguage: languages[Math.floor(Math.random() * languages.length)],
+                    testKeys: this.shuffleArray(textKeys).slice(0, 5) // 随机选择5个键进行测试
+                };
+            }
+            
+            /**
+             * 测试语言切换完整性
+             * @param {LanguageManager} languageManager - 语言管理器
+             * @param {Object} scenario - 测试场景
+             * @param {number} iteration - 迭代次数
+             * @param {HTMLElement} section - 测试区域
+             * @returns {boolean} 是否通过
+             */
+            async testLanguageSwitchCompleteness(languageManager, scenario, iteration, section) {
+                const { startLanguage, targetLanguage, testKeys } = scenario;
+                
+                // 设置起始语言
+                languageManager.setLanguage(startLanguage);
+                
+                // 记录切换前的文本
+                const beforeTexts = {};
+                testKeys.forEach(key => {
+                    beforeTexts[key] = languageManager.getText(key);
+                });
+                
+                // 切换到目标语言
+                languageManager.setLanguage(targetLanguage);
+                
+                // 记录切换后的文本
+                const afterTexts = {};
+                testKeys.forEach(key => {
+                    afterTexts[key] = languageManager.getText(key);
+                });
+                
+                // 验证文本是否发生了变化（如果语言不同）
+                let allTextsUpdated = true;
+                const failedKeys = [];
+                
+                testKeys.forEach(key => {
+                    if (startLanguage !== targetLanguage) {
+                        // 如果语言不同，文本应该发生变化
+                        if (beforeTexts[key] === afterTexts[key]) {
+                            allTextsUpdated = false;
+                            failedKeys.push(key);
+                        }
+                    } else {
+                        // 如果语言相同，文本应该保持不变
+                        if (beforeTexts[key] !== afterTexts[key]) {
+                            allTextsUpdated = false;
+                            failedKeys.push(key);
+                        }
+                    }
+                });
+                
+                // 验证文本不为空且不等于键名（表示翻译存在）
+                testKeys.forEach(key => {
+                    const text = afterTexts[key];
+                    if (!text || text === key || text.length === 0) {
+                        allTextsUpdated = false;
+                        failedKeys.push(`${key} (missing translation)`);
+                    }
+                });
+                
+                // 测试算法信息的完整性
+                const algorithmInfoTest = this.testAlgorithmInfoCompleteness(languageManager, targetLanguage);
+                if (!algorithmInfoTest.passed) {
+                    allTextsUpdated = false;
+                    failedKeys.push(...algorithmInfoTest.failedKeys);
+                }
+                
+                // 测试步骤描述的完整性
+                const stepDescriptionTest = this.testStepDescriptionCompleteness(languageManager, targetLanguage);
+                if (!stepDescriptionTest.passed) {
+                    allTextsUpdated = false;
+                    failedKeys.push(...stepDescriptionTest.failedKeys);
+                }
+                
+                // 记录详细结果（仅在失败或前10次迭代时显示）
+                if (!allTextsUpdated || iteration <= 10) {
+                    const resultMessage = allTextsUpdated ? 
+                        `✓ 语言切换 ${startLanguage} → ${targetLanguage}，所有文本正确更新` :
+                        `✗ 语言切换失败，问题键: ${failedKeys.join(', ')}`;
+                    
+                    this.addTestResult(
+                        section,
+                        `迭代 ${iteration} (${startLanguage} → ${targetLanguage})`,
+                        allTextsUpdated,
+                        resultMessage
+                    );
+                }
+                
+                return allTextsUpdated;
+            }
+            
+            /**
+             * 测试算法信息完整性
+             * @param {LanguageManager} languageManager - 语言管理器
+             * @param {string} language - 目标语言
+             * @returns {Object} 测试结果
+             */
+            testAlgorithmInfoCompleteness(languageManager, language) {
+                const algorithms = ['bubbleSort', 'selectionSort', 'mergeSort', 'quickSort'];
+                const failedKeys = [];
+                let passed = true;
+                
+                algorithms.forEach(algorithm => {
+                    try {
+                        const info = languageManager.getAlgorithmInfo(algorithm);
+                        
+                        // 检查必需字段
+                        const requiredFields = ['name', 'description'];
+                        requiredFields.forEach(field => {
+                            if (!info[field] || info[field].length === 0) {
+                                passed = false;
+                                failedKeys.push(`${algorithm}.${field}`);
+                            }
+                        });
+                        
+                        // 检查时间复杂度
+                        if (info.timeComplexity) {
+                            ['best', 'average', 'worst'].forEach(case_ => {
+                                if (!info.timeComplexity[case_]) {
+                                    passed = false;
+                                    failedKeys.push(`${algorithm}.timeComplexity.${case_}`);
+                                }
+                            });
+                        }
+                        
+                    } catch (error) {
+                        passed = false;
+                        failedKeys.push(`${algorithm} (error: ${error.message})`);
+                    }
+                });
+                
+                return { passed, failedKeys };
+            }
+            
+            /**
+             * 测试步骤描述完整性
+             * @param {LanguageManager} languageManager - 语言管理器
+             * @param {string} language - 目标语言
+             * @returns {Object} 测试结果
+             */
+            testStepDescriptionCompleteness(languageManager, language) {
+                const stepTypes = ['comparing', 'swapping', 'completed', 'paused'];
+                const failedKeys = [];
+                let passed = true;
+                
+                stepTypes.forEach(stepType => {
+                    try {
+                        const params = {
+                            value1: '42',
+                            value2: '24',
+                            pos1: '0',
+                            pos2: '1',
+                            algorithm: 'Test Algorithm'
+                        };
+                        
+                        const description = languageManager.getStepDescription(stepType, params);
+                        
+                        if (!description || description.length === 0 || description === stepType) {
+                            passed = false;
+                            failedKeys.push(`stepDescription.${stepType}`);
+                        }
+                        
+                        // 检查参数替换是否正常工作
+                        if (stepType === 'comparing' && !description.includes('42') && !description.includes('24')) {
+                            passed = false;
+                            failedKeys.push(`stepDescription.${stepType} (parameter substitution)`);
+                        }
+                        
+                    } catch (error) {
+                        passed = false;
+                        failedKeys.push(`stepDescription.${stepType} (error: ${error.message})`);
+                    }
+                });
+                
+                return { passed, failedKeys };
+            }
+            
+            /**
+             * 洗牌数组
+             * @param {Array} array - 要洗牌的数组
+             * @returns {Array} 洗牌后的数组
+             */
+            shuffleArray(array) {
+                const shuffled = [...array];
+                for (let i = shuffled.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                }
+                return shuffled;
+            }
+            
+            /**
+             * 创建测试区域
+             * @param {string} title - 测试区域标题
+             * @returns {HTMLElement} 测试区域元素
+             */
+            createTestSection(title) {
+                const section = document.createElement('div');
+                section.className = 'test-section';
+                section.innerHTML = `<h3>${title}</h3>`;
+                this.testContainer.appendChild(section);
+                return section;
+            }
+            
+            /**
+             * 添加测试结果
+             * @param {HTMLElement} section - 测试区域
+             * @param {string} testName - 测试名称
+             * @param {boolean} passed - 是否通过
+             * @param {string} message - 结果消息
+             */
+            addTestResult(section, testName, passed, message) {
+                const result = {
+                    name: testName,
+                    passed: passed,
+                    message: message
+                };
+                
+                this.results.push(result);
+                
+                const resultDiv = document.createElement('div');
+                resultDiv.className = `test-result ${passed ? 'test-pass' : 'test-fail'}`;
+                resultDiv.innerHTML = `
+                    <strong>${passed ? '✓' : '✗'} ${testName}</strong><br>
+                    ${message}
+                `;
+                
+                section.appendChild(resultDiv);
+            }
+            
+            /**
+             * 显示测试总结
+             */
+            showSummary() {
+                const totalTests = this.results.length;
+                const passedTests = this.results.filter(r => r.passed).length;
+                const failedTests = totalTests - passedTests;
+                
+                const allPassed = failedTests === 0;
+                
+                this.summaryContainer.innerHTML = `
+                    <div class="test-summary ${allPassed ? 'summary-pass' : 'summary-fail'}">
+                        <h2>🎯 属性测试总结</h2>
+                        <p><strong>Feature: sorting-visualization, Property 10: 语言切换完整性</strong></p>
+                        <p>总测试数: ${totalTests}</p>
+                        <p>通过: ${passedTests}</p>
+                        <p>失败: ${failedTests}</p>
+                        <p>通过率: ${totalTests > 0 ? ((passedTests / totalTests) * 100).toFixed(1) : 0}%</p>
+                        <p><strong>${allPassed ? '🎉 属性验证通过！' : '❌ 属性验证失败'}</strong></p>
+                    </div>
+                `;
+                
+                console.log(`属性测试完成: ${passedTests}/${totalTests} 通过`);
+            }
+        }
+        
+        // 全局测试实例
+        const languagePropertyTests = new LanguageManagementPropertyTests();
+        
+        /**
+         * 运行属性测试的全局函数
+         */
+        function runPropertyTests() {
+            languagePropertyTests.runPropertyTests();
+        }
+        
+        /**
+         * 运行单次测试的全局函数
+         */
+        function runSingleTest() {
+            languagePropertyTests.runSingleTest();
+        }
+        
+        // 页面加载完成后准备测试环境
+        window.addEventListener('load', () => {
+            // 等待语言管理器加载
+            setTimeout(() => {
+                if (window.languageManager) {
+                    console.log('语言管理器已加载，准备进行属性测试');
+                } else {
+                    console.error('语言管理器未加载，请检查依赖');
+                }
+            }, 500);
+        });
+    </script>
+    
+    <!-- 引入语言管理器进行测试 -->
+    <script src="language-manager.js"></script>
+</body>
+</html>

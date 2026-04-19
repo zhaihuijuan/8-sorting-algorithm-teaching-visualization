@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教学步骤调试</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 12px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(74, 158, 255, 0.3);
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
+        }
+        
+        .log {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            border-left: 4px solid #4caf50;
+            color: #4caf50;
+        }
+        
+        .status {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #4a9eff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align: center; color: #4a9eff; margin-bottom: 30px;">🔍 教学步骤调试</h1>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <button class="btn" onclick="testTeachingStep()">🎓 测试教学步骤</button>
+            <button class="btn" onclick="testPromptBox()">📦 测试提示框</button>
+            <button class="btn" onclick="clearLog()">🧹 清除日志</button>
+        </div>
+        
+        <div class="status" id="status">
+            状态：等待测试...
+        </div>
+        
+        <div class="log" id="log">
+            点击上方按钮开始调试...
+        </div>
+    </div>
+
+    <!-- 引入必要的脚本 -->
+    <script src="language-manager.js"></script>
+    <script src="sorting-algorithms.js"></script>
+    <script src="ui-handler.js"></script>
+
+    <script>
+        function log(message) {
+            const logElement = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.textContent += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+        
+        function updateStatus(message) {
+            document.getElementById('status').textContent = `状态：${message}`;
+        }
+        
+        function clearLog() {
+            document.getElementById('log').textContent = '日志已清除...\n';
+            updateStatus('等待测试...');
+        }
+        
+        // 测试教学步骤
+        async function testTeachingStep() {
+            clearLog();
+            log('🎓 开始测试教学步骤');
+            updateStatus('测试中...');
+            
+            try {
+                // 创建测试环境
+                const visualizer = new Visualizer();
+                const engine = new SortingEngine(visualizer);
+                const uiHandler = new UIHandler();
+                
+                // 设置全局引用
+                window.uiHandler = uiHandler;
+                
+                // 启用教学模式
+                engine.setTeachingMode(true);
+                uiHandler.teachingMode = true;
+                
+                log('✅ 教学模式已启用');
+                log('📞 调用 teachingStep 方法...');
+                
+                const startTime = Date.now();
+                
+                // 调用教学步骤
+                const result = await engine.teachingStep('comparing', {
+                    value1: 5,
+                    value2: 2,
+                    pos1: 0,
+                    pos2: 1
+                });
+                
+                const endTime = Date.now();
+                const duration = endTime - startTime;
+                
+                log(`⏱️ 教学步骤耗时: ${duration}ms`);
+                log(`📤 返回结果: ${result}`);
+                
+                if (duration < 100) {
+                    log('⚠️ 警告：教学步骤完成太快，可能没有等待用户确认');
+                    updateStatus('可能存在问题');
+                } else {
+                    log('✅ 教学步骤正常，有等待时间');
+                    updateStatus('测试通过');
+                }
+                
+            } catch (error) {
+                log(`❌ 测试失败: ${error.message}`);
+                console.error('Test error:', error);
+                updateStatus('测试失败');
+            }
+        }
+        
+        // 测试提示框
+        async function testPromptBox() {
+            clearLog();
+            log('📦 开始测试提示框');
+            updateStatus('测试提示框...');
+            
+            try {
+                // 创建UI处理器
+                const uiHandler = new UIHandler();
+                uiHandler.teachingMode = true;
+                
+                log('📞 调用 showTeachingStepPrompt 方法...');
+                
+                const startTime = Date.now();
+                
+                // 直接调用提示框方法
+                const result = await uiHandler.showTeachingStepPrompt(
+                    '正在比较两个元素的大小',
+                    '比较操作是排序算法的基础，通过比较我们可以确定元素的相对顺序。'
+                );
+                
+                const endTime = Date.now();
+                const duration = endTime - startTime;
+                
+                log(`⏱️ 提示框耗时: ${duration}ms`);
+                log(`📤 返回结果: ${result}`);
+                
+                if (duration < 100) {
+                    log('⚠️ 警告：提示框关闭太快，可能没有等待用户交互');
+                    updateStatus('提示框可能有问题');
+                } else {
+                    log('✅ 提示框正常，等待了用户交互');
+                    updateStatus('提示框测试通过');
+                }
+                
+            } catch (error) {
+                log(`❌ 提示框测试失败: ${error.message}`);
+                console.error('Prompt box test error:', error);
+                updateStatus('提示框测试失败');
+            }
+        }
+        
+        // 页面加载完成后初始化
+        window.addEventListener('load', () => {
+            log('🚀 页面加载完成');
+            
+            // 检查必要的类是否存在
+            if (typeof SortingEngine === 'undefined') {
+                log('❌ SortingEngine 类未找到');
+                return;
+            }
+            
+            if (typeof UIHandler === 'undefined') {
+                log('❌ UIHandler 类未找到');
+                return;
+            }
+            
+            log('✅ 所有必要的类都已加载');
+            log('📋 准备就绪，可以开始调试');
+            updateStatus('准备就绪');
+        });
+    </script>
+</body>
+</html>

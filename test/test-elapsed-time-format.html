@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>耗时格式化测试</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            border-left: 4px solid #4a9eff;
+        }
+        
+        .test-button {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(74, 158, 255, 0.3);
+        }
+        
+        .test-result {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        
+        .format-example {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+        
+        .original {
+            color: #ffc107;
+        }
+        
+        .formatted {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .stats-display {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #4a9eff;
+        }
+        
+        /* 耗时显示特殊样式 - 等宽字体和固定宽度 */
+        #elapsed-time {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            letter-spacing: 0.5px;
+            min-width: 120px;
+            text-align: center;
+            display: inline-block;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #b0b0b0;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🕒 耗时格式化测试</h1>
+        <p>测试新的耗时显示格式：将毫秒转换为更直观的"秒+毫秒"或"分+秒+毫秒"格式</p>
+        
+        <div class="test-section">
+            <h2>📊 格式化示例</h2>
+            <div id="format-examples"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🎮 实时测试</h2>
+            <p>点击按钮开始计时，观察耗时格式的实时变化</p>
+            <button id="start-timer" class="test-button">开始计时</button>
+            <button id="stop-timer" class="test-button" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">停止计时</button>
+            <button id="reset-timer" class="test-button" style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%);">重置计时</button>
+            
+            <div class="stats-display">
+                <div class="stat-item">
+                    <div class="stat-value" id="elapsed-time">0ms</div>
+                    <div class="stat-label">耗时</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="raw-time">0</div>
+                    <div class="stat-label">原始毫秒</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>📋 测试结果</h2>
+            <div id="test-results" class="test-result">等待测试开始...</div>
+        </div>
+    </div>
+
+    <!-- 引入核心文件 -->
+    <script src="language-manager.js"></script>
+    <script src="sorting-algorithms.js"></script>
+    <script src="ui-handler.js"></script>
+
+    <script>
+        // 格式化耗时函数（固定位置版本）
+        function formatElapsedTime(elapsedTime) {
+            if (elapsedTime < 1000) {
+                // 小于1秒时，毫秒部分固定3位，右对齐
+                return `${elapsedTime.toString().padStart(3, ' ')}ms`;
+            }
+            
+            const seconds = Math.floor(elapsedTime / 1000);
+            const milliseconds = elapsedTime % 1000;
+            
+            if (seconds < 60) {
+                // 1-59秒：秒部分固定2位，毫秒部分固定3位
+                const secPart = seconds.toString().padStart(2, ' ');
+                const msPart = milliseconds.toString().padStart(3, '0');
+                return `${secPart}s+${msPart}ms`;
+            }
+            
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            
+            // 1分钟以上：分钟固定2位，秒固定2位，毫秒固定3位
+            const minPart = minutes.toString().padStart(2, ' ');
+            const secPart = remainingSeconds.toString().padStart(2, '0');
+            const msPart = milliseconds.toString().padStart(3, '0');
+            
+            if (remainingSeconds === 0 && milliseconds === 0) {
+                return `${minPart}m+00s+000ms`;
+            } else if (milliseconds === 0) {
+                return `${minPart}m+${secPart}s+000ms`;
+            } else if (remainingSeconds === 0) {
+                return `${minPart}m+00s+${msPart}ms`;
+            } else {
+                return `${minPart}m+${secPart}s+${msPart}ms`;
+            }
+        }
+
+        // 测试用例
+        const testCases = [
+            { ms: 0, description: '0毫秒' },
+            { ms: 5, description: '5毫秒' },
+            { ms: 50, description: '50毫秒' },
+            { ms: 500, description: '500毫秒' },
+            { ms: 999, description: '999毫秒' },
+            { ms: 1000, description: '1秒整' },
+            { ms: 1005, description: '1.005秒' },
+            { ms: 1050, description: '1.05秒' },
+            { ms: 1500, description: '1.5秒' },
+            { ms: 5000, description: '5秒整' },
+            { ms: 5250, description: '5.25秒' },
+            { ms: 19703, description: '19.703秒（用户示例）' },
+            { ms: 59999, description: '59.999秒' },
+            { ms: 60000, description: '1分钟整' },
+            { ms: 60005, description: '1分0.005秒' },
+            { ms: 65000, description: '1分5秒整' },
+            { ms: 65250, description: '1分5.25秒' },
+            { ms: 125703, description: '2分5.703秒' },
+            { ms: 180000, description: '3分钟整' },
+            { ms: 3661500, description: '61分1.5秒' }
+        ];
+
+        // 显示格式化示例
+        function showFormatExamples() {
+            const container = document.getElementById('format-examples');
+            container.innerHTML = '';
+            
+            testCases.forEach(testCase => {
+                const example = document.createElement('div');
+                example.className = 'format-example';
+                
+                const formatted = formatElapsedTime(testCase.ms);
+                
+                example.innerHTML = `
+                    <span class="original">${testCase.ms}ms (${testCase.description})</span>
+                    <span>→</span>
+                    <span class="formatted">${formatted}</span>
+                `;
+                
+                container.appendChild(example);
+            });
+        }
+
+        // 实时计时器
+        let startTime = null;
+        let timerInterval = null;
+        let isRunning = false;
+
+        function startTimer() {
+            if (isRunning) return;
+            
+            startTime = Date.now();
+            isRunning = true;
+            
+            timerInterval = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                const formatted = formatElapsedTime(elapsed);
+                
+                document.getElementById('elapsed-time').textContent = formatted;
+                document.getElementById('raw-time').textContent = elapsed;
+                
+                // 记录测试结果
+                logTestResult(`实时: ${elapsed}ms → ${formatted}`);
+            }, 100);
+            
+            document.getElementById('start-timer').disabled = true;
+        }
+
+        function stopTimer() {
+            if (!isRunning) return;
+            
+            clearInterval(timerInterval);
+            isRunning = false;
+            document.getElementById('start-timer').disabled = false;
+            
+            const finalElapsed = Date.now() - startTime;
+            const finalFormatted = formatElapsedTime(finalElapsed);
+            
+            logTestResult(`⏹️ 停止计时: ${finalElapsed}ms → ${finalFormatted}`, 'success');
+        }
+
+        function resetTimer() {
+            stopTimer();
+            document.getElementById('elapsed-time').textContent = '0ms';
+            document.getElementById('raw-time').textContent = '0';
+            document.getElementById('test-results').textContent = '计时器已重置';
+        }
+
+        function logTestResult(message, type = 'info') {
+            const resultsElement = document.getElementById('test-results');
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+            
+            resultsElement.textContent = `[${timestamp}] ${prefix} ${message}`;
+        }
+
+        // 事件监听器
+        document.getElementById('start-timer').addEventListener('click', startTimer);
+        document.getElementById('stop-timer').addEventListener('click', stopTimer);
+        document.getElementById('reset-timer').addEventListener('click', resetTimer);
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            showFormatExamples();
+            logTestResult('耗时格式化测试工具已就绪', 'success');
+        });
+    </script>
+</body>
+</html>

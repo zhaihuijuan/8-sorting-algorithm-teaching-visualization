@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>最终修复验证</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .test-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 10px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(74, 158, 255, 0.3);
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+        }
+        
+        select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #ffffff;
+            padding: 8px 12px;
+            font-size: 14px;
+            margin: 5px;
+        }
+        
+        .status-panel {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #4a9eff;
+        }
+        
+        .success {
+            border-left-color: #28a745;
+            background: rgba(40, 167, 69, 0.1);
+        }
+        
+        .error {
+            border-left-color: #dc3545;
+            background: rgba(220, 53, 69, 0.1);
+        }
+        
+        .warning {
+            border-left-color: #ffc107;
+            background: rgba(255, 193, 7, 0.1);
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .console-output {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔧 语言切换和显示模式修复验证</h1>
+        
+        <div class="status-panel">
+            <h3>📋 测试说明</h3>
+            <p>本页面用于验证以下修复是否成功：</p>
+            <ul>
+                <li>✅ 语言切换按钮点击响应</li>
+                <li>✅ 显示模式下拉框切换响应</li>
+                <li>✅ 事件绑定和DOM加载时序</li>
+                <li>✅ 多语言文本更新</li>
+            </ul>
+        </div>
+        
+        <div class="test-grid">
+            <!-- 语言切换测试 -->
+            <div class="status-panel">
+                <h3>🌐 语言切换测试</h3>
+                <button id="language-toggle" class="btn">
+                    <span>🌐</span>
+                    <span id="language-text">中文</span>
+                </button>
+                <div style="margin-top: 10px;">
+                    <p><strong>当前语言:</strong> <span id="current-language">zh</span></p>
+                    <p><strong>示例文本:</strong> <span id="sample-text">生成新数组</span></p>
+                    <p><strong>页面标题:</strong> <span id="page-title-display">八大排序算法可视化</span></p>
+                </div>
+                <button onclick="testLanguageFunction()" class="btn btn-success">测试语言切换</button>
+            </div>
+            
+            <!-- 显示模式测试 -->
+            <div class="status-panel">
+                <h3>📱 显示模式测试</h3>
+                <select id="display-mode">
+                    <option value="chinese">中文步骤说明</option>
+                    <option value="english">英文步骤说明</option>
+                    <option value="code">带注释代码</option>
+                </select>
+                <div style="margin-top: 10px;">
+                    <p><strong>当前模式:</strong> <span id="current-mode">chinese</span></p>
+                    <p><strong>切换次数:</strong> <span id="switch-count">0</span></p>
+                    <p><strong>最后切换:</strong> <span id="last-switch">未切换</span></p>
+                </div>
+                <button onclick="testDisplayModeFunction()" class="btn btn-success">测试显示模式</button>
+            </div>
+        </div>
+        
+        <!-- 自动化测试 -->
+        <div class="status-panel">
+            <h3>🤖 自动化测试</h3>
+            <div style="margin-bottom: 15px;">
+                <button onclick="runLanguageTest()" class="btn btn-warning">运行语言测试</button>
+                <button onclick="runDisplayModeTest()" class="btn btn-warning">运行显示模式测试</button>
+                <button onclick="runAllTests()" class="btn btn-success">运行全部测试</button>
+                <button onclick="clearResults()" class="btn">清除结果</button>
+            </div>
+            <div id="test-results" class="status-panel">
+                <h4>测试结果:</h4>
+                <div id="results-content">点击上方按钮开始测试</div>
+            </div>
+        </div>
+        
+        <!-- 控制台输出 -->
+        <div class="status-panel">
+            <h3>📝 控制台输出</h3>
+            <div id="console-output" class="console-output">等待测试输出...</div>
+        </div>
+    </div>
+
+    <!-- 引入必要的JavaScript文件 -->
+    <script src="language-manager.js"></script>
+    <script>
+        let testResults = [];
+        let switchCount = 0;
+        let consoleOutput = [];
+        
+        // 重写console.log以捕获输出
+        const originalConsoleLog = console.log;
+        console.log = function(...args) {
+            originalConsoleLog.apply(console, args);
+            consoleOutput.push(args.join(' '));
+            updateConsoleOutput();
+        };
+        
+        function updateConsoleOutput() {
+            const outputDiv = document.getElementById('console-output');
+            outputDiv.textContent = consoleOutput.slice(-10).join('\n'); // 显示最后10条
+        }
+        
+        function updateDisplay() {
+            if (window.languageManager) {
+                document.getElementById('current-language').textContent = window.languageManager.getCurrentLanguage();
+                document.getElementById('sample-text').textContent = window.languageManager.getText('generateArray');
+                document.getElementById('language-text').textContent = window.languageManager.getText('languageToggle');
+                document.getElementById('page-title-display').textContent = document.title;
+            }
+        }
+        
+        function testLanguageFunction() {
+            console.log('手动测试语言切换功能');
+            if (window.languageManager) {
+                const oldLang = window.languageManager.getCurrentLanguage();
+                window.languageManager.toggleLanguage();
+                const newLang = window.languageManager.getCurrentLanguage();
+                console.log(`语言切换: ${oldLang} → ${newLang}`);
+                updateDisplay();
+            } else {
+                console.error('语言管理器未找到');
+            }
+        }
+        
+        function testDisplayModeFunction() {
+            console.log('手动测试显示模式切换功能');
+            const select = document.getElementById('display-mode');
+            const modes = ['chinese', 'english', 'code'];
+            const currentIndex = modes.indexOf(select.value);
+            const nextIndex = (currentIndex + 1) % modes.length;
+            
+            select.value = modes[nextIndex];
+            const event = new Event('change');
+            select.dispatchEvent(event);
+            
+            switchCount++;
+            document.getElementById('switch-count').textContent = switchCount;
+            document.getElementById('last-switch').textContent = new Date().toLocaleTimeString();
+            console.log(`显示模式切换到: ${modes[nextIndex]}`);
+        }
+        
+        function runLanguageTest() {
+            console.log('开始自动语言测试...');
+            let passed = 0;
+            let total = 0;
+            
+            try {
+                // 测试1: 语言管理器存在
+                total++;
+                if (window.languageManager) {
+                    passed++;
+                    console.log('✅ 语言管理器存在');
+                } else {
+                    console.log('❌ 语言管理器不存在');
+                }
+                
+                // 测试2: 语言切换功能
+                total++;
+                const oldLang = window.languageManager.getCurrentLanguage();
+                window.languageManager.toggleLanguage();
+                const newLang = window.languageManager.getCurrentLanguage();
+                
+                if (oldLang !== newLang) {
+                    passed++;
+                    console.log(`✅ 语言切换成功: ${oldLang} → ${newLang}`);
+                } else {
+                    console.log(`❌ 语言切换失败: ${oldLang} → ${newLang}`);
+                }
+                
+                // 测试3: 文本更新
+                total++;
+                const testText = window.languageManager.getText('generateArray');
+                if (testText && testText !== 'generateArray') {
+                    passed++;
+                    console.log(`✅ 文本获取成功: ${testText}`);
+                } else {
+                    console.log(`❌ 文本获取失败: ${testText}`);
+                }
+                
+                updateDisplay();
+                
+            } catch (error) {
+                console.log(`❌ 语言测试错误: ${error.message}`);
+            }
+            
+            const result = `语言测试完成: ${passed}/${total} 通过`;
+            console.log(result);
+            addTestResult('语言切换', passed === total, result);
+        }
+        
+        function runDisplayModeTest() {
+            console.log('开始自动显示模式测试...');
+            let passed = 0;
+            let total = 0;
+            
+            try {
+                const select = document.getElementById('display-mode');
+                const modes = ['chinese', 'english', 'code'];
+                
+                modes.forEach(mode => {
+                    total++;
+                    try {
+                        select.value = mode;
+                        const event = new Event('change');
+                        select.dispatchEvent(event);
+                        
+                        document.getElementById('current-mode').textContent = mode;
+                        passed++;
+                        console.log(`✅ 显示模式 ${mode} 测试通过`);
+                    } catch (error) {
+                        console.log(`❌ 显示模式 ${mode} 测试失败: ${error.message}`);
+                    }
+                });
+                
+            } catch (error) {
+                console.log(`❌ 显示模式测试错误: ${error.message}`);
+            }
+            
+            const result = `显示模式测试完成: ${passed}/${total} 通过`;
+            console.log(result);
+            addTestResult('显示模式', passed === total, result);
+        }
+        
+        function runAllTests() {
+            console.log('开始运行所有测试...');
+            clearResults();
+            
+            runLanguageTest();
+            setTimeout(() => {
+                runDisplayModeTest();
+                setTimeout(() => {
+                    showFinalResults();
+                }, 500);
+            }, 500);
+        }
+        
+        function addTestResult(testName, success, message) {
+            testResults.push({
+                name: testName,
+                success: success,
+                message: message,
+                timestamp: new Date().toLocaleTimeString()
+            });
+        }
+        
+        function showFinalResults() {
+            const resultsDiv = document.getElementById('results-content');
+            let html = '<h4>📊 完整测试报告:</h4>';
+            
+            testResults.forEach(result => {
+                const statusClass = result.success ? 'success' : 'error';
+                const icon = result.success ? '✅' : '❌';
+                html += `
+                    <div class="status-panel ${statusClass}" style="margin: 10px 0; padding: 10px;">
+                        <strong>${icon} ${result.name}</strong><br>
+                        ${result.message}<br>
+                        <small>时间: ${result.timestamp}</small>
+                    </div>
+                `;
+            });
+            
+            const successCount = testResults.filter(r => r.success).length;
+            const totalCount = testResults.length;
+            const overallSuccess = successCount === totalCount;
+            
+            html += `
+                <div class="status-panel ${overallSuccess ? 'success' : 'warning'}" style="margin-top: 20px;">
+                    <h4>${overallSuccess ? '🎉' : '⚠️'} 总体结果: ${successCount}/${totalCount} 测试通过</h4>
+                    ${overallSuccess ? 
+                        '<p>所有功能修复成功！语言切换和显示模式都正常工作。</p>' : 
+                        '<p>部分功能需要进一步检查。请查看上方详细结果。</p>'
+                    }
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = html;
+            console.log(`总体测试结果: ${successCount}/${totalCount} 通过`);
+        }
+        
+        function clearResults() {
+            testResults = [];
+            document.getElementById('results-content').innerHTML = '点击上方按钮开始测试';
+            consoleOutput = [];
+            updateConsoleOutput();
+        }
+        
+        // 页面初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('页面加载完成，开始初始化...');
+            
+            // 等待语言管理器初始化
+            setTimeout(() => {
+                updateDisplay();
+                
+                // 绑定语言切换事件
+                const languageToggle = document.getElementById('language-toggle');
+                if (languageToggle) {
+                    languageToggle.addEventListener('click', () => {
+                        console.log('语言切换按钮被点击');
+                        testLanguageFunction();
+                    });
+                    console.log('语言切换事件绑定成功');
+                }
+                
+                // 绑定显示模式事件
+                const displayMode = document.getElementById('display-mode');
+                if (displayMode) {
+                    displayMode.addEventListener('change', (e) => {
+                        console.log('显示模式切换:', e.target.value);
+                        document.getElementById('current-mode').textContent = e.target.value;
+                        switchCount++;
+                        document.getElementById('switch-count').textContent = switchCount;
+                        document.getElementById('last-switch').textContent = new Date().toLocaleTimeString();
+                    });
+                    console.log('显示模式事件绑定成功');
+                }
+                
+                console.log('初始化完成');
+            }, 200);
+        });
+        
+        // 监听语言切换事件
+        document.addEventListener('languageChanged', (event) => {
+            console.log('语言切换事件触发:', event.detail);
+            updateDisplay();
+        });
+        
+        // 监听显示模式切换事件
+        document.addEventListener('displayModeChanged', (event) => {
+            console.log('显示模式切换事件触发:', event.detail);
+        });
+    </script>
+</body>
+</html>

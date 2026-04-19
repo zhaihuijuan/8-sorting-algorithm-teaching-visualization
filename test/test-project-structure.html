@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目结构单元测试</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #ffffff;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+        }
+        
+        .test-result {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        
+        .test-pass {
+            background: rgba(40, 167, 69, 0.2);
+            border-left: 4px solid #28a745;
+        }
+        
+        .test-fail {
+            background: rgba(220, 53, 69, 0.2);
+            border-left: 4px solid #dc3545;
+        }
+        
+        .test-summary {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .summary-pass {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+        }
+        
+        .summary-fail {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 项目结构单元测试</h1>
+        <p>测试HTML文件、CSS样式和JavaScript模块的基础结构</p>
+        
+        <button onclick="runAllTests()">运行所有测试</button>
+        <button onclick="location.href='index.html'">返回主页面</button>
+        
+        <div id="test-results"></div>
+        <div id="test-summary"></div>
+    </div>
+
+    <script>
+        class ProjectStructureTests {
+            constructor() {
+                this.results = [];
+                this.testContainer = document.getElementById('test-results');
+                this.summaryContainer = document.getElementById('test-summary');
+            }
+            
+            /**
+             * 运行所有测试
+             */
+            async runAllTests() {
+                this.results = [];
+                this.testContainer.innerHTML = '';
+                this.summaryContainer.innerHTML = '';
+                
+                console.log('开始运行项目结构测试...');
+                
+                // HTML结构测试
+                await this.testHTMLStructure();
+                
+                // CSS样式测试
+                await this.testCSSStyles();
+                
+                // JavaScript文件测试
+                await this.testJavaScriptFiles();
+                
+                // 显示测试总结
+                this.showSummary();
+            }
+            
+            /**
+             * 测试HTML结构
+             */
+            async testHTMLStructure() {
+                const section = this.createTestSection('HTML结构测试');
+                
+                // 测试主要面板是否存在
+                const panels = [
+                    { selector: '.control-panel', name: '控制面板' },
+                    { selector: '.visualization-area', name: '可视化区域' },
+                    { selector: '.info-panel', name: '信息面板' },
+                    { selector: '.steps-panel', name: '步骤面板' }
+                ];
+                
+                panels.forEach(panel => {
+                    const element = document.querySelector(panel.selector);
+                    this.addTestResult(
+                        section,
+                        `${panel.name}存在性检查`,
+                        element !== null,
+                        element ? '✓ 面板存在' : '✗ 面板不存在'
+                    );
+                });
+                
+                // 测试控制按钮是否存在
+                const buttons = [
+                    'generate-array', 'start-sort', 'pause-sort', 
+                    'resume-sort', 'reset-sort', 'complexity-compare', 
+                    'teaching-mode', 'language-toggle'
+                ];
+                
+                buttons.forEach(buttonId => {
+                    const button = document.getElementById(buttonId);
+                    this.addTestResult(
+                        section,
+                        `按钮 ${buttonId} 存在性检查`,
+                        button !== null,
+                        button ? '✓ 按钮存在' : '✗ 按钮不存在'
+                    );
+                });
+                
+                // 测试输入控件是否存在
+                const inputs = [
+                    'algorithm-select', 'array-size', 'sort-speed', 'display-mode'
+                ];
+                
+                inputs.forEach(inputId => {
+                    const input = document.getElementById(inputId);
+                    this.addTestResult(
+                        section,
+                        `输入控件 ${inputId} 存在性检查`,
+                        input !== null,
+                        input ? '✓ 控件存在' : '✗ 控件不存在'
+                    );
+                });
+                
+                // 测试模态框是否存在
+                const modals = ['algorithm-modal', 'complexity-modal'];
+                modals.forEach(modalId => {
+                    const modal = document.getElementById(modalId);
+                    this.addTestResult(
+                        section,
+                        `模态框 ${modalId} 存在性检查`,
+                        modal !== null,
+                        modal ? '✓ 模态框存在' : '✗ 模态框不存在'
+                    );
+                });
+            }
+            
+            /**
+             * 测试CSS样式
+             */
+            async testCSSStyles() {
+                const section = this.createTestSection('CSS样式测试');
+                
+                // 测试深色主题
+                const body = document.body;
+                const bodyStyles = window.getComputedStyle(body);
+                const backgroundColor = bodyStyles.backgroundColor;
+                
+                this.addTestResult(
+                    section,
+                    '深色主题背景检查',
+                    backgroundColor.includes('rgb') && !backgroundColor.includes('255, 255, 255'),
+                    `背景色: ${backgroundColor}`
+                );
+                
+                // 测试渐变背景
+                const backgroundImage = bodyStyles.backgroundImage;
+                this.addTestResult(
+                    section,
+                    '渐变背景检查',
+                    backgroundImage.includes('gradient'),
+                    backgroundImage.includes('gradient') ? '✓ 使用渐变背景' : '✗ 未使用渐变背景'
+                );
+                
+                // 测试响应式布局
+                const mainContainer = document.querySelector('.main-container');
+                if (mainContainer) {
+                    const containerStyles = window.getComputedStyle(mainContainer);
+                    this.addTestResult(
+                        section,
+                        'Grid布局检查',
+                        containerStyles.display === 'grid',
+                        `Display: ${containerStyles.display}`
+                    );
+                }
+                
+                // 测试按钮样式
+                const button = document.getElementById('start-sort');
+                if (button) {
+                    const buttonStyles = window.getComputedStyle(button);
+                    this.addTestResult(
+                        section,
+                        '按钮渐变样式检查',
+                        buttonStyles.backgroundImage.includes('gradient'),
+                        buttonStyles.backgroundImage.includes('gradient') ? '✓ 按钮使用渐变' : '✗ 按钮未使用渐变'
+                    );
+                }
+                
+                // 测试工具提示样式
+                const tooltip = document.querySelector('.tooltip .tooltiptext');
+                if (tooltip) {
+                    const tooltipStyles = window.getComputedStyle(tooltip);
+                    this.addTestResult(
+                        section,
+                        '工具提示样式检查',
+                        tooltipStyles.visibility === 'hidden',
+                        `工具提示可见性: ${tooltipStyles.visibility}`
+                    );
+                }
+            }
+            
+            /**
+             * 测试JavaScript文件
+             */
+            async testJavaScriptFiles() {
+                const section = this.createTestSection('JavaScript文件测试');
+                
+                // 测试语言管理器
+                this.addTestResult(
+                    section,
+                    'LanguageManager类存在性检查',
+                    typeof LanguageManager !== 'undefined',
+                    typeof LanguageManager !== 'undefined' ? '✓ LanguageManager已定义' : '✗ LanguageManager未定义'
+                );
+                
+                this.addTestResult(
+                    section,
+                    '全局languageManager实例检查',
+                    typeof window.languageManager !== 'undefined',
+                    typeof window.languageManager !== 'undefined' ? '✓ 全局实例存在' : '✗ 全局实例不存在'
+                );
+                
+                // 测试排序引擎
+                this.addTestResult(
+                    section,
+                    'SortingEngine类存在性检查',
+                    typeof SortingEngine !== 'undefined',
+                    typeof SortingEngine !== 'undefined' ? '✓ SortingEngine已定义' : '✗ SortingEngine未定义'
+                );
+                
+                // 测试UI控制器
+                this.addTestResult(
+                    section,
+                    'UIHandler类存在性检查',
+                    typeof UIHandler !== 'undefined',
+                    typeof UIHandler !== 'undefined' ? '✓ UIHandler已定义' : '✗ UIHandler未定义'
+                );
+                
+                this.addTestResult(
+                    section,
+                    'Visualizer类存在性检查',
+                    typeof Visualizer !== 'undefined',
+                    typeof Visualizer !== 'undefined' ? '✓ Visualizer已定义' : '✗ Visualizer未定义'
+                );
+                
+                // 测试语言管理器功能
+                if (window.languageManager) {
+                    const currentLang = window.languageManager.getCurrentLanguage();
+                    this.addTestResult(
+                        section,
+                        '语言管理器初始语言检查',
+                        currentLang === 'zh',
+                        `当前语言: ${currentLang}`
+                    );
+                    
+                    const testText = window.languageManager.getText('pageTitle');
+                    this.addTestResult(
+                        section,
+                        '语言管理器文本获取检查',
+                        typeof testText === 'string' && testText.length > 0,
+                        `获取到的文本: ${testText}`
+                    );
+                }
+                
+                // 测试UI控制器实例
+                setTimeout(() => {
+                    this.addTestResult(
+                        section,
+                        '全局uiHandler实例检查',
+                        typeof window.uiHandler !== 'undefined',
+                        typeof window.uiHandler !== 'undefined' ? '✓ UI控制器实例存在' : '✗ UI控制器实例不存在'
+                    );
+                }, 100);
+            }
+            
+            /**
+             * 创建测试区域
+             * @param {string} title - 测试区域标题
+             * @returns {HTMLElement} 测试区域元素
+             */
+            createTestSection(title) {
+                const section = document.createElement('div');
+                section.className = 'test-section';
+                section.innerHTML = `<h3>${title}</h3>`;
+                this.testContainer.appendChild(section);
+                return section;
+            }
+            
+            /**
+             * 添加测试结果
+             * @param {HTMLElement} section - 测试区域
+             * @param {string} testName - 测试名称
+             * @param {boolean} passed - 是否通过
+             * @param {string} message - 结果消息
+             */
+            addTestResult(section, testName, passed, message) {
+                const result = {
+                    name: testName,
+                    passed: passed,
+                    message: message
+                };
+                
+                this.results.push(result);
+                
+                const resultDiv = document.createElement('div');
+                resultDiv.className = `test-result ${passed ? 'test-pass' : 'test-fail'}`;
+                resultDiv.innerHTML = `
+                    <strong>${passed ? '✓' : '✗'} ${testName}</strong><br>
+                    ${message}
+                `;
+                
+                section.appendChild(resultDiv);
+            }
+            
+            /**
+             * 显示测试总结
+             */
+            showSummary() {
+                const totalTests = this.results.length;
+                const passedTests = this.results.filter(r => r.passed).length;
+                const failedTests = totalTests - passedTests;
+                
+                const allPassed = failedTests === 0;
+                
+                this.summaryContainer.innerHTML = `
+                    <div class="test-summary ${allPassed ? 'summary-pass' : 'summary-fail'}">
+                        <h2>测试总结</h2>
+                        <p>总测试数: ${totalTests}</p>
+                        <p>通过: ${passedTests}</p>
+                        <p>失败: ${failedTests}</p>
+                        <p><strong>${allPassed ? '🎉 所有测试通过！' : '❌ 部分测试失败'}</strong></p>
+                    </div>
+                `;
+                
+                console.log(`测试完成: ${passedTests}/${totalTests} 通过`);
+            }
+        }
+        
+        // 全局测试实例
+        const projectTests = new ProjectStructureTests();
+        
+        /**
+         * 运行所有测试的全局函数
+         */
+        function runAllTests() {
+            projectTests.runAllTests();
+        }
+        
+        // 页面加载完成后自动运行测试
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                runAllTests();
+            }, 500); // 等待其他脚本加载完成
+        });
+    </script>
+    
+    <!-- 引入主项目的JavaScript文件进行测试 -->
+    <script src="language-manager.js"></script>
+    <script src="sorting-algorithms.js"></script>
+    <script src="ui-handler.js"></script>
+</body>
+</html>

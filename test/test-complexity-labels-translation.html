@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>八大排序算法可视化</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .test-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .btn {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 10px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(74, 158, 255, 0.3);
+            margin: 5px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+        }
+        .info-section {
+            margin-bottom: 25px;
+        }
+        .info-section h3 {
+            color: #4a9eff;
+            margin-bottom: 10px;
+            font-size: 16px;
+            border-bottom: 1px solid rgba(74, 158, 255, 0.3);
+            padding-bottom: 5px;
+        }
+        .info-section p, .info-section ul {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #b0b0b0;
+        }
+        .status-display {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid #28a745;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Complexity Labels Translation Test</h1>
+    
+    <div class="test-panel">
+        <h2>Language Control</h2>
+        <button id="language-toggle" class="btn btn-secondary">
+            <span>🌐</span>
+            <span id="language-text">中文</span>
+        </button>
+        
+        <div class="status-display" id="language-status">
+            Current Language: zh<br>
+            Status: Initializing...
+        </div>
+    </div>
+    
+    <div class="test-panel">
+        <h2>Algorithm Info Panel (Test Target)</h2>
+        
+        <div class="info-section">
+            <h3 id="algorithm-info-title">算法信息</h3>
+            <div id="algorithm-info-content">
+                <p><strong id="time-complexity-label">时间复杂度:</strong></p>
+                <ul>
+                    <li><span id="time-best-label">最好情况:</span> <span id="time-best">O(n)</span></li>
+                    <li><span id="time-average-label">平均情况:</span> <span id="time-average">O(n²)</span></li>
+                    <li><span id="time-worst-label">最坏情况:</span> <span id="time-worst">O(n²)</span></li>
+                </ul>
+                <p><strong id="space-complexity-label">空间复杂度:</strong> <span id="space-complexity">O(1)</span></p>
+                <p><strong id="stability-label">稳定性:</strong> <span id="stability">稳定</span></p>
+                <p id="algorithm-description">冒泡排序是一种简单的排序算法，通过重复遍历数组，比较相邻元素并交换位置来排序。</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-panel">
+        <h2>Test Actions</h2>
+        <button onclick="testLanguageToggle()" class="btn">Toggle Language</button>
+        <button onclick="testComplexityLabels()" class="btn">Test Complexity Labels</button>
+        <button onclick="showTranslations()" class="btn">Show Translations</button>
+    </div>
+    
+    <div class="test-panel">
+        <h2>Translation Test Results</h2>
+        <div id="test-results" style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; font-family: monospace; font-size: 12px; min-height: 100px;">
+            Click "Test Complexity Labels" to see translation results...
+        </div>
+    </div>
+
+    <script src="language-manager.js"></script>
+    <script>
+        function updateLanguageStatus() {
+            const statusElement = document.getElementById('language-status');
+            const currentLang = window.languageManager ? window.languageManager.getCurrentLanguage() : 'unknown';
+            const pageTitle = document.title;
+            const managerStatus = window.languageManager ? 'Ready' : 'Not Found';
+            
+            if (statusElement) {
+                statusElement.innerHTML = `
+                    Current Language: <strong>${currentLang}</strong><br>
+                    Page Title: <strong>${pageTitle}</strong><br>
+                    Language Manager: <strong>${managerStatus}</strong><br>
+                    Last Updated: ${new Date().toLocaleTimeString()}
+                `;
+            }
+        }
+        
+        function testLanguageToggle() {
+            if (window.languageManager) {
+                console.log('Testing language toggle...');
+                window.languageManager.toggleLanguage();
+                updateLanguageStatus();
+            } else {
+                alert('Language manager not found!');
+            }
+        }
+        
+        function testComplexityLabels() {
+            const resultsElement = document.getElementById('test-results');
+            if (!window.languageManager) {
+                resultsElement.innerHTML = 'ERROR: Language manager not found!';
+                return;
+            }
+            
+            const currentLang = window.languageManager.getCurrentLanguage();
+            const labels = [
+                'time-complexity-label',
+                'time-best-label', 
+                'time-average-label',
+                'time-worst-label',
+                'space-complexity-label',
+                'stability-label'
+            ];
+            
+            let results = `Testing complexity labels translation (${currentLang}):\n\n`;
+            
+            labels.forEach(labelId => {
+                const element = document.getElementById(labelId);
+                if (element) {
+                    results += `${labelId}: "${element.textContent}"\n`;
+                } else {
+                    results += `${labelId}: NOT FOUND\n`;
+                }
+            });
+            
+            // Test translation keys
+            results += '\nTranslation keys:\n';
+            const keys = [
+                'complexity.timeComplexityTitle',
+                'complexity.timeBest',
+                'complexity.timeAverage', 
+                'complexity.timeWorst',
+                'complexity.spaceComplexityTitle',
+                'complexity.stabilityTitle'
+            ];
+            
+            keys.forEach(key => {
+                const translation = window.languageManager.getText(key);
+                results += `${key}: "${translation}"\n`;
+            });
+            
+            resultsElement.textContent = results;
+        }
+        
+        function showTranslations() {
+            const resultsElement = document.getElementById('test-results');
+            if (!window.languageManager) {
+                resultsElement.innerHTML = 'ERROR: Language manager not found!';
+                return;
+            }
+            
+            const currentLang = window.languageManager.getCurrentLanguage();
+            const otherLang = currentLang === 'zh' ? 'en' : 'zh';
+            
+            let results = `Current translations (${currentLang} vs ${otherLang}):\n\n`;
+            
+            const keys = [
+                'complexity.timeComplexityTitle',
+                'complexity.timeBest',
+                'complexity.timeAverage', 
+                'complexity.timeWorst',
+                'complexity.spaceComplexityTitle',
+                'complexity.stabilityTitle'
+            ];
+            
+            keys.forEach(key => {
+                const currentTranslation = window.languageManager.getText(key);
+                
+                // Temporarily switch language to get other translation
+                const oldLang = window.languageManager.currentLanguage;
+                window.languageManager.currentLanguage = otherLang;
+                const otherTranslation = window.languageManager.getText(key);
+                window.languageManager.currentLanguage = oldLang;
+                
+                results += `${key}:\n  ${currentLang}: "${currentTranslation}"\n  ${otherLang}: "${otherTranslation}"\n\n`;
+            });
+            
+            resultsElement.textContent = results;
+        }
+        
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, initializing test...');
+            
+            // Wait a bit for language manager to initialize
+            setTimeout(() => {
+                updateLanguageStatus();
+                testComplexityLabels();
+                
+                // Listen for language change events
+                document.addEventListener('languageChanged', (event) => {
+                    console.log('Language changed event received:', event.detail);
+                    updateLanguageStatus();
+                    testComplexityLabels();
+                });
+            }, 200);
+        });
+    </script>
+</body>
+</html>

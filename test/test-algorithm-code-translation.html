@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>八大排序算法可视化</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .test-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .btn {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 10px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(74, 158, 255, 0.3);
+            margin: 5px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+        }
+        select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #ffffff;
+            padding: 8px 12px;
+            font-size: 14px;
+            margin: 5px;
+        }
+        select option {
+            background: #1a1a2e;
+            color: #ffffff;
+        }
+        .info-section {
+            margin-bottom: 25px;
+        }
+        .info-section h3 {
+            color: #4a9eff;
+            margin-bottom: 10px;
+            font-size: 16px;
+            border-bottom: 1px solid rgba(74, 158, 255, 0.3);
+            padding-bottom: 5px;
+        }
+        .status-display {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid #28a745;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        pre {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 1.4;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Algorithm Code Translation Test</h1>
+    
+    <div class="test-panel">
+        <h2>Language Control</h2>
+        <button id="language-toggle" class="btn btn-secondary">
+            <span>🌐</span>
+            <span id="language-text">中文</span>
+        </button>
+        
+        <div class="status-display" id="language-status">
+            Current Language: zh<br>
+            Status: Initializing...
+        </div>
+    </div>
+    
+    <div class="test-panel">
+        <h2>Algorithm Selection</h2>
+        <select id="algorithm-select">
+            <option value="bubbleSort">冒泡排序</option>
+            <option value="selectionSort">选择排序</option>
+            <option value="insertionSort">插入排序</option>
+            <option value="mergeSort">归并排序</option>
+            <option value="quickSort">快速排序</option>
+            <option value="heapSort">堆排序</option>
+            <option value="countingSort">计数排序</option>
+            <option value="radixSort">基数排序</option>
+        </select>
+        
+        <button onclick="updateCode()" class="btn">Update Code</button>
+    </div>
+    
+    <div class="test-panel">
+        <div class="info-section">
+            <h3 id="code-title">算法代码</h3>
+            <pre id="algorithm-code">// 选择一个算法查看代码</pre>
+        </div>
+    </div>
+    
+    <div class="test-panel">
+        <h2>Test Actions</h2>
+        <button onclick="testLanguageToggle()" class="btn">Toggle Language</button>
+        <button onclick="testAllAlgorithms()" class="btn">Test All Algorithms</button>
+        <button onclick="showCodeComparison()" class="btn">Show Code Comparison</button>
+    </div>
+    
+    <div class="test-panel">
+        <h2>Test Results</h2>
+        <div id="test-results" style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; font-family: monospace; font-size: 12px; max-height: 300px; overflow-y: auto;">
+            Click "Test All Algorithms" to see translation results...
+        </div>
+    </div>
+
+    <script src="language-manager.js"></script>
+    <script>
+        let currentAlgorithm = 'bubbleSort';
+        
+        function updateLanguageStatus() {
+            const statusElement = document.getElementById('language-status');
+            const currentLang = window.languageManager ? window.languageManager.getCurrentLanguage() : 'unknown';
+            const pageTitle = document.title;
+            const managerStatus = window.languageManager ? 'Ready' : 'Not Found';
+            
+            if (statusElement) {
+                statusElement.innerHTML = `
+                    Current Language: <strong>${currentLang}</strong><br>
+                    Page Title: <strong>${pageTitle}</strong><br>
+                    Language Manager: <strong>${managerStatus}</strong><br>
+                    Last Updated: ${new Date().toLocaleTimeString()}
+                `;
+            }
+        }
+        
+        function updateCode() {
+            if (!window.languageManager) {
+                alert('Language manager not found!');
+                return;
+            }
+            
+            const select = document.getElementById('algorithm-select');
+            currentAlgorithm = select.value;
+            
+            const codeElement = document.getElementById('algorithm-code');
+            const code = window.languageManager.getAlgorithmCode(currentAlgorithm);
+            codeElement.textContent = code;
+        }
+        
+        function testLanguageToggle() {
+            if (window.languageManager) {
+                console.log('Testing language toggle...');
+                window.languageManager.toggleLanguage();
+                updateLanguageStatus();
+                updateCode(); // Update code after language change
+                
+                // Update algorithm select options
+                updateAlgorithmSelect();
+            } else {
+                alert('Language manager not found!');
+            }
+        }
+        
+        function updateAlgorithmSelect() {
+            if (!window.languageManager) return;
+            
+            const select = document.getElementById('algorithm-select');
+            const options = select.querySelectorAll('option');
+            options.forEach(option => {
+                const algorithmKey = option.value;
+                const translation = window.languageManager.getText(`algorithms.${algorithmKey}`);
+                if (translation) {
+                    option.textContent = translation;
+                }
+            });
+        }
+        
+        function testAllAlgorithms() {
+            const resultsElement = document.getElementById('test-results');
+            if (!window.languageManager) {
+                resultsElement.innerHTML = 'ERROR: Language manager not found!';
+                return;
+            }
+            
+            const currentLang = window.languageManager.getCurrentLanguage();
+            const algorithms = ['bubbleSort', 'selectionSort', 'insertionSort', 'mergeSort', 
+                              'quickSort', 'heapSort', 'countingSort', 'radixSort'];
+            
+            let results = `Testing algorithm codes translation (${currentLang}):\n\n`;
+            
+            algorithms.forEach(algorithm => {
+                const code = window.languageManager.getAlgorithmCode(algorithm);
+                const firstLine = code.split('\n')[0];
+                results += `${algorithm}: ${firstLine}\n`;
+            });
+            
+            resultsElement.textContent = results;
+        }
+        
+        function showCodeComparison() {
+            const resultsElement = document.getElementById('test-results');
+            if (!window.languageManager) {
+                resultsElement.innerHTML = 'ERROR: Language manager not found!';
+                return;
+            }
+            
+            const currentLang = window.languageManager.getCurrentLanguage();
+            const otherLang = currentLang === 'zh' ? 'en' : 'zh';
+            
+            let results = `Code comparison for ${currentAlgorithm} (${currentLang} vs ${otherLang}):\n\n`;
+            
+            // Get current language code
+            const currentCode = window.languageManager.getAlgorithmCode(currentAlgorithm);
+            
+            // Temporarily switch language to get other version
+            const oldLang = window.languageManager.currentLanguage;
+            window.languageManager.currentLanguage = otherLang;
+            const otherCode = window.languageManager.getAlgorithmCode(currentAlgorithm);
+            window.languageManager.currentLanguage = oldLang;
+            
+            // Show first few lines of each version
+            const currentLines = currentCode.split('\n').slice(0, 8);
+            const otherLines = otherCode.split('\n').slice(0, 8);
+            
+            results += `${currentLang} version:\n${currentLines.join('\n')}\n\n`;
+            results += `${otherLang} version:\n${otherLines.join('\n')}\n`;
+            
+            resultsElement.textContent = results;
+        }
+        
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, initializing test...');
+            
+            // Wait a bit for language manager to initialize
+            setTimeout(() => {
+                updateLanguageStatus();
+                updateCode();
+                updateAlgorithmSelect();
+                
+                // Listen for language change events
+                document.addEventListener('languageChanged', (event) => {
+                    console.log('Language changed event received:', event.detail);
+                    updateLanguageStatus();
+                    updateCode();
+                    updateAlgorithmSelect();
+                });
+                
+                // Listen for algorithm selection changes
+                const select = document.getElementById('algorithm-select');
+                select.addEventListener('change', (e) => {
+                    currentAlgorithm = e.target.value;
+                    updateCode();
+                });
+            }, 200);
+        });
+    </script>
+</body>
+</html>

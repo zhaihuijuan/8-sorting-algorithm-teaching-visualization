@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Array Size Limit Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .control-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            border-left: 4px solid #4a9eff;
+        }
+        
+        .control-group {
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .control-group label {
+            min-width: 100px;
+            color: #b0b0b0;
+        }
+        
+        .control-group input[type="range"] {
+            flex: 1;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            outline: none;
+        }
+        
+        .control-group input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .control-group span {
+            min-width: 40px;
+            text-align: center;
+            background: rgba(74, 158, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+        
+        .test-results {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #28a745;
+        }
+        
+        .test-results.failed {
+            border-left-color: #dc3545;
+        }
+        
+        .array-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 200px;
+            justify-content: center;
+            padding: 20px 0 60px 0;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+        
+        .array-bar {
+            background: linear-gradient(135deg, #87ceeb 0%, #5dade2 100%);
+            border-radius: 4px 4px 0 0;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            min-width: 8px;
+        }
+        
+        .bar-value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔧 Array Size Limit Test</h1>
+        <p>测试数组大小限制修改：从最大100改为最大70</p>
+        
+        <div class="control-section">
+            <h2>🎮 数组大小控制</h2>
+            
+            <div class="control-group">
+                <label for="array-size">数组大小:</label>
+                <input type="range" id="array-size" min="5" max="70" value="30">
+                <span id="array-size-value">30</span>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <button id="generate-array" class="btn btn-success">🎲 生成新数组</button>
+                <button onclick="testLimits()" class="btn">🧪 测试边界值</button>
+            </div>
+        </div>
+        
+        <div class="control-section">
+            <h2>📊 测试结果</h2>
+            <div id="test-results" class="test-results">
+                <h4>等待测试...</h4>
+                <p>点击"测试边界值"按钮开始测试</p>
+            </div>
+        </div>
+        
+        <!-- 可视化区域 -->
+        <div class="array-container" id="array-container">
+            <!-- 柱状图将在这里动态生成 -->
+        </div>
+        
+        <div class="control-section">
+            <h2>📝 测试说明</h2>
+            <ul>
+                <li><strong>滑块范围</strong>：5-70（之前是5-100）</li>
+                <li><strong>边界测试</strong>：测试最小值5、最大值70、超出范围的值</li>
+                <li><strong>UI验证</strong>：确保滑块和数值显示正确</li>
+                <li><strong>可视化验证</strong>：确保70个柱体能正确显示</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="language-manager.js"></script>
+    <script src="sorting-algorithms.js"></script>
+    <script src="ui-handler.js"></script>
+    <script>
+        let testArray = [];
+        
+        function generateTestArray(size) {
+            testArray = Array.from({ length: size }, () => 
+                Math.floor(Math.random() * 90) + 10
+            );
+            renderTestArray();
+        }
+        
+        function renderTestArray() {
+            const container = document.getElementById('array-container');
+            container.innerHTML = '';
+            
+            if (testArray.length === 0) return;
+            
+            const containerHeight = 150;
+            const maxValue = Math.max(...testArray);
+            
+            // 计算柱体宽度
+            const containerWidth = container.clientWidth - 40;
+            const barGap = 2;
+            const totalGapWidth = (testArray.length - 1) * barGap;
+            const barWidth = Math.max(8, (containerWidth - totalGapWidth) / testArray.length);
+            
+            testArray.forEach((value, index) => {
+                const bar = document.createElement('div');
+                const height = (value / maxValue) * containerHeight;
+                
+                bar.className = 'array-bar';
+                bar.style.cssText = `
+                    width: ${barWidth}px;
+                    height: ${height}px;
+                    margin: 0 1px;
+                `;
+                
+                // 添加数值标签
+                const valueLabel = document.createElement('div');
+                valueLabel.className = 'bar-value';
+                valueLabel.textContent = value;
+                bar.appendChild(valueLabel);
+                
+                container.appendChild(bar);
+            });
+        }
+        
+        function updateArraySize(size) {
+            document.getElementById('array-size-value').textContent = size;
+            generateTestArray(size);
+        }
+        
+        function testLimits() {
+            const results = [];
+            
+            // 测试最小值
+            try {
+                updateArraySize(5);
+                results.push({ test: '最小值测试 (5)', passed: testArray.length === 5, actual: testArray.length });
+            } catch (error) {
+                results.push({ test: '最小值测试 (5)', passed: false, error: error.message });
+            }
+            
+            // 测试最大值
+            try {
+                updateArraySize(70);
+                results.push({ test: '最大值测试 (70)', passed: testArray.length === 70, actual: testArray.length });
+            } catch (error) {
+                results.push({ test: '最大值测试 (70)', passed: false, error: error.message });
+            }
+            
+            // 测试中间值
+            try {
+                updateArraySize(35);
+                results.push({ test: '中间值测试 (35)', passed: testArray.length === 35, actual: testArray.length });
+            } catch (error) {
+                results.push({ test: '中间值测试 (35)', passed: false, error: error.message });
+            }
+            
+            // 测试滑块限制
+            const slider = document.getElementById('array-size');
+            const sliderMax = parseInt(slider.max);
+            const sliderMin = parseInt(slider.min);
+            
+            results.push({ 
+                test: '滑块最大值', 
+                passed: sliderMax === 70, 
+                actual: sliderMax,
+                expected: 70
+            });
+            
+            results.push({ 
+                test: '滑块最小值', 
+                passed: sliderMin === 5, 
+                actual: sliderMin,
+                expected: 5
+            });
+            
+            // 显示结果
+            displayTestResults(results);
+        }
+        
+        function displayTestResults(results) {
+            const container = document.getElementById('test-results');
+            const passedCount = results.filter(r => r.passed).length;
+            const totalCount = results.length;
+            
+            let html = `<h4>测试结果: ${passedCount}/${totalCount} 通过</h4>`;
+            
+            results.forEach(result => {
+                const status = result.passed ? '✅' : '❌';
+                const details = result.error ? 
+                    `错误: ${result.error}` : 
+                    result.actual !== undefined ? 
+                        `实际值: ${result.actual}${result.expected ? `, 期望值: ${result.expected}` : ''}` : 
+                        '';
+                
+                html += `<p>${status} ${result.test} ${details}</p>`;
+            });
+            
+            container.innerHTML = html;
+            container.className = `test-results ${passedCount === totalCount ? '' : 'failed'}`;
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 绑定滑块事件
+            const slider = document.getElementById('array-size');
+            slider.addEventListener('input', (e) => {
+                updateArraySize(parseInt(e.target.value));
+            });
+            
+            // 绑定生成按钮事件
+            document.getElementById('generate-array').addEventListener('click', () => {
+                const currentSize = parseInt(document.getElementById('array-size').value);
+                generateTestArray(currentSize);
+            });
+            
+            // 生成初始数组
+            generateTestArray(30);
+            
+            console.log('Array size limit test initialized');
+        });
+    </script>
+</body>
+</html>

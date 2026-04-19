@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>页面标题测试</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #4a9eff;
+            margin-bottom: 30px;
+        }
+
+        /* 页面标题样式 */
+        .page-header {
+            text-align: center;
+            padding: 20px 0 10px 0;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #4a9eff 0%, #20c997 50%, #ffc107 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 10px rgba(74, 158, 255, 0.3);
+            margin: 0;
+            letter-spacing: 1px;
+        }
+
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            border-left: 4px solid #4a9eff;
+        }
+
+        .test-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 10px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(74, 158, 255, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
+        }
+
+        .status {
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .status.success {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid #28a745;
+            color: #28a745;
+        }
+
+        .status.info {
+            background: rgba(74, 158, 255, 0.2);
+            border: 1px solid #4a9eff;
+            color: #4a9eff;
+        }
+
+        .current-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .info-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .info-label {
+            color: #b0b0b0;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: #4a9eff;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🎯 页面标题中英文切换测试</h1>
+        
+        <!-- 页面标题展示 -->
+        <div class="page-header">
+            <h1 class="page-title" id="page-title">八大排序算法可视化</h1>
+        </div>
+        
+        <div class="test-section">
+            <h2>📋 测试说明</h2>
+            <p>这个测试验证页面标题能否正确进行中英文切换：</p>
+            <ul>
+                <li>✅ 页面标题显示在顶部，使用渐变色彩效果</li>
+                <li>✅ 点击语言切换按钮，标题文本会相应改变</li>
+                <li>✅ 浏览器标签页标题也会同步更新</li>
+                <li>✅ 标题样式在不同语言下保持一致</li>
+            </ul>
+        </div>
+        
+        <div class="test-section">
+            <h2>🎛️ 控制面板</h2>
+            <div class="test-controls">
+                <button id="language-toggle" class="btn">
+                    <span>🌐</span>
+                    <span id="language-text">中文</span>
+                </button>
+                <button onclick="testTitleUpdate()" class="btn">测试标题更新</button>
+                <button onclick="showCurrentInfo()" class="btn">显示当前信息</button>
+            </div>
+            
+            <div class="current-info">
+                <div class="info-item">
+                    <div class="info-label">当前语言</div>
+                    <div class="info-value" id="current-language">zh</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">页面标题</div>
+                    <div class="info-value" id="current-title">八大排序算法可视化</div>
+                </div>
+            </div>
+            
+            <div id="test-status" class="status info">
+                准备测试页面标题的中英文切换功能
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>📊 测试结果</h2>
+            <div id="test-results">
+                <p>点击上方按钮开始测试...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入语言管理器 -->
+    <script src="language-manager.js"></script>
+    
+    <script>
+        // 测试函数
+        function testTitleUpdate() {
+            const statusDiv = document.getElementById('test-status');
+            const resultsDiv = document.getElementById('test-results');
+            
+            try {
+                // 获取当前语言和标题
+                const currentLang = window.languageManager.getCurrentLanguage();
+                const currentTitle = document.getElementById('page-title').textContent;
+                const browserTitle = document.title;
+                
+                statusDiv.className = 'status success';
+                statusDiv.textContent = '✅ 标题更新测试成功';
+                
+                resultsDiv.innerHTML = `
+                    <div style="background: rgba(40, 167, 69, 0.1); padding: 15px; border-radius: 8px; border-left: 4px solid #28a745;">
+                        <h4 style="color: #28a745; margin: 0 0 10px 0;">测试结果：</h4>
+                        <p>✅ 当前语言: ${currentLang}</p>
+                        <p>✅ 页面标题: ${currentTitle}</p>
+                        <p>✅ 浏览器标题: ${browserTitle}</p>
+                        <p>✅ 标题元素正确更新</p>
+                    </div>
+                `;
+                
+                // 更新信息显示
+                showCurrentInfo();
+                
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = '❌ 标题更新测试失败: ' + error.message;
+                
+                resultsDiv.innerHTML = `
+                    <div style="background: rgba(220, 53, 69, 0.1); padding: 15px; border-radius: 8px; border-left: 4px solid #dc3545;">
+                        <h4 style="color: #dc3545; margin: 0 0 10px 0;">错误信息：</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function showCurrentInfo() {
+            if (window.languageManager) {
+                const currentLang = window.languageManager.getCurrentLanguage();
+                const currentTitle = document.getElementById('page-title').textContent;
+                
+                document.getElementById('current-language').textContent = currentLang;
+                document.getElementById('current-title').textContent = currentTitle;
+            }
+        }
+        
+        // 页面加载完成后初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('页面标题测试页面加载完成');
+            
+            // 确保语言管理器已初始化
+            if (window.languageManager) {
+                console.log('语言管理器已就绪');
+                
+                // 绑定语言切换按钮
+                const languageToggle = document.getElementById('language-toggle');
+                if (languageToggle) {
+                    languageToggle.addEventListener('click', () => {
+                        console.log('切换语言...');
+                        window.languageManager.toggleLanguage();
+                        
+                        // 更新语言按钮文本
+                        const languageText = document.getElementById('language-text');
+                        if (languageText) {
+                            languageText.textContent = window.languageManager.getText('languageToggle');
+                        }
+                        
+                        // 显示更新后的信息
+                        showCurrentInfo();
+                        
+                        // 自动运行测试
+                        setTimeout(testTitleUpdate, 100);
+                    });
+                }
+                
+                // 初始化显示
+                showCurrentInfo();
+            } else {
+                console.error('语言管理器未找到');
+            }
+        });
+        
+        // 监听语言切换事件
+        document.addEventListener('languageChanged', (event) => {
+            console.log('语言切换事件触发:', event.detail);
+            showCurrentInfo();
+        });
+    </script>
+</body>
+</html>

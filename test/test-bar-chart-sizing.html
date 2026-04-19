@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>柱状图尺寸测试</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .test-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .test-section h2 {
+            color: #4a9eff;
+            margin-bottom: 15px;
+        }
+        
+        .visualization-area {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            min-height: 300px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            position: relative;
+            overflow-x: auto;
+            margin-bottom: 15px;
+        }
+        
+        .array-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 100%;
+            justify-content: center;
+            padding: 20px 0;
+            min-width: fit-content;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+        
+        .info {
+            background: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid #ffc107;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #b0b0b0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>柱状图固定尺寸测试</h1>
+        
+        <div class="test-section">
+            <h2>测试说明</h2>
+            <div class="info">
+                <p><strong>测试目标：</strong>验证柱状图容器大小固定在40个柱体时的尺寸，柱体宽度根据数量自适应</p>
+                <p><strong>预期效果：</strong></p>
+                <ul>
+                    <li>容器总宽度保持固定（基于40个柱体的参考尺寸）</li>
+                    <li>柱体数量少时，每个柱体更宽</li>
+                    <li>柱体数量多时，每个柱体更窄</li>
+                    <li>总宽度 = 柱体数量 × 柱体宽度 + 间距</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>测试1: 5个元素（柱体应该很宽）</h2>
+            <div class="controls">
+                <button class="btn" onclick="testArraySize(5)">生成5个元素</button>
+                <span id="info-5">柱体宽度: 待计算</span>
+            </div>
+            <div class="visualization-area">
+                <div class="array-container" id="container-5"></div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>测试2: 20个元素（柱体应该中等宽度）</h2>
+            <div class="controls">
+                <button class="btn" onclick="testArraySize(20)">生成20个元素</button>
+                <span id="info-20">柱体宽度: 待计算</span>
+            </div>
+            <div class="visualization-area">
+                <div class="array-container" id="container-20"></div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>测试3: 40个元素（参考尺寸，柱体宽度20px）</h2>
+            <div class="controls">
+                <button class="btn" onclick="testArraySize(40)">生成40个元素</button>
+                <span id="info-40">柱体宽度: 待计算</span>
+            </div>
+            <div class="visualization-area">
+                <div class="array-container" id="container-40"></div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>测试4: 80个元素（柱体应该很窄）</h2>
+            <div class="controls">
+                <button class="btn" onclick="testArraySize(80)">生成80个元素</button>
+                <span id="info-80">柱体宽度: 待计算</span>
+            </div>
+            <div class="visualization-area">
+                <div class="array-container" id="container-80"></div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>测试5: 100个元素（最大数量，柱体应该最窄）</h2>
+            <div class="controls">
+                <button class="btn" onclick="testArraySize(100)">生成100个元素</button>
+                <span id="info-100">柱体宽度: 待计算</span>
+            </div>
+            <div class="visualization-area">
+                <div class="array-container" id="container-100"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 简化的可视化器类，用于测试
+        class TestVisualizer {
+            constructor(containerId) {
+                this.container = document.getElementById(containerId);
+                this.bars = [];
+            }
+            
+            renderArray(array) {
+                if (!this.container) return;
+                
+                this.container.innerHTML = '';
+                this.bars = [];
+                const maxValue = Math.max(...array);
+                
+                const containerHeight = 200; // 固定高度用于测试
+                
+                // 固定容器宽度基于40个柱体的参考尺寸
+                const referenceBarCount = 40;
+                const referenceBarWidth = 20;
+                const barGap = 2;
+                const fixedTotalWidth = referenceBarCount * referenceBarWidth + (referenceBarCount - 1) * barGap;
+                
+                // 根据当前数组大小计算柱体宽度
+                const barWidth = Math.max(8, (fixedTotalWidth - (array.length - 1) * barGap) / array.length);
+                
+                // 设置容器的固定宽度
+                this.container.style.width = `${fixedTotalWidth}px`;
+                this.container.style.margin = '0 auto';
+                
+                // 更新信息显示
+                const infoElement = document.getElementById(`info-${array.length}`);
+                if (infoElement) {
+                    infoElement.textContent = `柱体宽度: ${barWidth.toFixed(1)}px, 容器宽度: ${fixedTotalWidth}px`;
+                }
+                
+                array.forEach((value, index) => {
+                    const bar = this.createBar(value, index, barWidth, containerHeight, maxValue);
+                    this.container.appendChild(bar);
+                    this.bars.push(bar);
+                });
+            }
+            
+            createBar(value, index, width, maxHeight, maxValue) {
+                const bar = document.createElement('div');
+                const height = (value / maxValue) * maxHeight;
+                
+                bar.style.cssText = `
+                    width: ${width}px;
+                    height: ${height}px;
+                    background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+                    margin: 0 1px;
+                    border-radius: 4px 4px 0 0;
+                    position: relative;
+                    transition: all 0.3s ease;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    align-items: center;
+                    box-shadow: 0 2px 8px rgba(74, 158, 255, 0.3);
+                    flex-shrink: 0;
+                `;
+                
+                // 顶部数值
+                const valueLabel = document.createElement('div');
+                valueLabel.textContent = value;
+                const fontSize = Math.max(8, Math.min(12, width * 0.6));
+                valueLabel.style.cssText = `
+                    position: absolute;
+                    top: -20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    color: #ffffff;
+                    font-size: ${fontSize}px;
+                    font-weight: bold;
+                    white-space: nowrap;
+                `;
+                
+                // 底部索引
+                const indexLabel = document.createElement('div');
+                indexLabel.textContent = index;
+                const indexFontSize = Math.max(6, Math.min(10, width * 0.5));
+                indexLabel.style.cssText = `
+                    position: absolute;
+                    bottom: -15px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    color: #b0b0b0;
+                    font-size: ${indexFontSize}px;
+                    white-space: nowrap;
+                `;
+                
+                bar.appendChild(valueLabel);
+                bar.appendChild(indexLabel);
+                
+                return bar;
+            }
+        }
+        
+        // 创建测试实例
+        const visualizers = {
+            5: new TestVisualizer('container-5'),
+            20: new TestVisualizer('container-20'),
+            40: new TestVisualizer('container-40'),
+            80: new TestVisualizer('container-80'),
+            100: new TestVisualizer('container-100')
+        };
+        
+        function testArraySize(size) {
+            // 生成随机数组
+            const array = Array.from({ length: size }, () => 
+                Math.floor(Math.random() * 90) + 10
+            );
+            
+            // 渲染数组
+            if (visualizers[size]) {
+                visualizers[size].renderArray(array);
+            }
+        }
+        
+        // 页面加载时自动运行所有测试
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                [5, 20, 40, 80, 100].forEach(size => {
+                    testArraySize(size);
+                });
+            }, 500);
+        });
+    </script>
+</body>
+</html>

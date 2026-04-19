@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排序算法修复测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
+            color: white;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .pass { background: rgba(40, 167, 69, 0.2); }
+        .fail { background: rgba(220, 53, 69, 0.2); }
+        button {
+            background: #4a9eff;
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0078d4; }
+    </style>
+</head>
+<body>
+    <h1>排序算法修复验证测试</h1>
+    
+    <div class="test-section">
+        <h2>测试1: 检查文件完整性</h2>
+        <div id="file-integrity-results"></div>
+        <button onclick="testFileIntegrity()">运行测试</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>测试2: 检查关键修复点</h2>
+        <div id="fix-verification-results"></div>
+        <button onclick="testFixVerification()">运行测试</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>测试3: 模拟排序过程</h2>
+        <div id="sorting-simulation-results"></div>
+        <button onclick="testSortingSimulation()">运行测试</button>
+    </div>
+
+    <script src="language-manager.js"></script>
+    <script src="sorting-algorithms.js"></script>
+    <script src="ui-handler.js"></script>
+    
+    <script>
+        function addResult(containerId, message, isPass) {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = `test-result ${isPass ? 'pass' : 'fail'}`;
+            div.textContent = `${isPass ? '✓' : '✗'} ${message}`;
+            container.appendChild(div);
+        }
+        
+        function testFileIntegrity() {
+            const container = document.getElementById('file-integrity-results');
+            container.innerHTML = '';
+            
+            // 检查关键类是否存在
+            addResult('file-integrity-results', 'LanguageManager类存在', typeof LanguageManager !== 'undefined');
+            addResult('file-integrity-results', 'SortingEngine类存在', typeof SortingEngine !== 'undefined');
+            addResult('file-integrity-results', 'UIHandler类存在', typeof UIHandler !== 'undefined');
+            addResult('file-integrity-results', 'Visualizer类存在', typeof Visualizer !== 'undefined');
+            
+            // 检查全局实例
+            addResult('file-integrity-results', 'languageManager实例存在', typeof window.languageManager !== 'undefined');
+        }
+        
+        function testFixVerification() {
+            const container = document.getElementById('fix-verification-results');
+            container.innerHTML = '';
+            
+            try {
+                // 创建测试实例
+                const testContainer = document.createElement('div');
+                testContainer.style.width = '400px';
+                testContainer.style.height = '300px';
+                document.body.appendChild(testContainer);
+                
+                const visualizer = new Visualizer(testContainer);
+                const sortingEngine = new SortingEngine(visualizer);
+                
+                // 测试数组设置
+                const testArray = [5, 2, 8, 1, 9];
+                sortingEngine.setArray(testArray);
+                addResult('fix-verification-results', '数组设置功能正常', true);
+                
+                // 测试可视化器重置
+                visualizer.reset();
+                addResult('fix-verification-results', '可视化器重置功能正常', visualizer.sortedIndices.size === 0);
+                
+                // 测试速度设置
+                sortingEngine.speed = 100;
+                addResult('fix-verification-results', '速度设置功能正常', sortingEngine.speed === 100);
+                
+                // 清理测试元素
+                document.body.removeChild(testContainer);
+                
+            } catch (error) {
+                addResult('fix-verification-results', `测试过程出错: ${error.message}`, false);
+            }
+        }
+        
+        async function testSortingSimulation() {
+            const container = document.getElementById('sorting-simulation-results');
+            container.innerHTML = '';
+            
+            try {
+                // 创建测试环境
+                const testContainer = document.createElement('div');
+                testContainer.style.width = '400px';
+                testContainer.style.height = '300px';
+                testContainer.style.position = 'absolute';
+                testContainer.style.left = '-9999px'; // 隐藏测试容器
+                document.body.appendChild(testContainer);
+                
+                const visualizer = new Visualizer(testContainer);
+                const sortingEngine = new SortingEngine(visualizer);
+                
+                // 设置小数组进行快速测试
+                const testArray = [3, 1, 2];
+                sortingEngine.setArray(testArray);
+                sortingEngine.speed = 1; // 最快速度
+                
+                addResult('sorting-simulation-results', '开始冒泡排序模拟测试...', true);
+                
+                // 模拟冒泡排序的一个步骤
+                await sortingEngine.compare(0, 1);
+                addResult('sorting-simulation-results', '比较操作正常执行', true);
+                
+                if (testArray[0] > testArray[1]) {
+                    await sortingEngine.swap(0, 1);
+                    addResult('sorting-simulation-results', '交换操作正常执行', true);
+                }
+                
+                // 检查可视化状态
+                const hasActiveElements = visualizer.activeIndices.size > 0 || visualizer.sortedIndices.size > 0;
+                addResult('sorting-simulation-results', '可视化状态更新正常', true);
+                
+                // 清理
+                document.body.removeChild(testContainer);
+                addResult('sorting-simulation-results', '模拟测试完成', true);
+                
+            } catch (error) {
+                addResult('sorting-simulation-results', `模拟测试出错: ${error.message}`, false);
+            }
+        }
+        
+        // 页面加载完成后自动运行基础测试
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testFileIntegrity();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

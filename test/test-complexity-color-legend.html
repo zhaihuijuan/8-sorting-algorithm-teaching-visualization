@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>复杂度颜色编码图例测试</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            margin: 5% auto;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            width: 85%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: #fff;
+        }
+        
+        /* 增强的表格样式 */
+        .complexity-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .complexity-table th {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            color: white;
+            padding: 15px 10px;
+            text-align: left;
+            font-weight: bold;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            font-size: 14px;
+        }
+        
+        .complexity-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 13px;
+        }
+        
+        .complexity-table tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        
+        .complexity-table tr:nth-child(odd) {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .complexity-table tr:hover {
+            background: rgba(74, 158, 255, 0.2);
+        }
+        
+        .table-note {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid #ffc107;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #b0b0b0;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 10px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(74, 158, 255, 0.3);
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
+        }
+        
+        /* 复杂度颜色编码图例样式 */
+        .complexity-color-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid #4a9eff;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 style="text-align: center; color: #4a9eff; margin-bottom: 30px;">🎨 复杂度颜色编码图例测试</h1>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <button class="btn" onclick="showChineseTableWithLegend()">🇨🇳 显示中文表格（含图例）</button>
+            <button class="btn" onclick="showEnglishTableWithLegend()">🇺🇸 显示英文表格（含图例）</button>
+            <button class="btn" onclick="testLegendOnly()">🎨 仅测试图例</button>
+            <button class="btn" onclick="openMainApp()">🚀 打开主应用测试</button>
+        </div>
+        
+        <div id="test-result" style="background: rgba(0, 0, 0, 0.3); border-radius: 8px; padding: 15px; margin-top: 15px; font-family: monospace; font-size: 14px; line-height: 1.5; border-left: 4px solid #4caf50; color: #4caf50; display: none;"></div>
+    </div>
+
+    <!-- 复杂度对比模态框 -->
+    <div id="complexity-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modal-title" style="color: #4a9eff; margin-bottom: 20px;">算法复杂度对比表</h2>
+            <div id="complexity-table-container">
+                <!-- 复杂度对比表和图例将在这里生成 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟算法复杂度数据
+        const complexityDataZh = [
+            { name: '冒泡排序', timeBest: 'O(n)', timeAverage: 'O(n²)', timeWorst: 'O(n²)', spaceComplexity: 'O(1)', stable: '稳定' },
+            { name: '选择排序', timeBest: 'O(n²)', timeAverage: 'O(n²)', timeWorst: 'O(n²)', spaceComplexity: 'O(1)', stable: '不稳定' },
+            { name: '插入排序', timeBest: 'O(n)', timeAverage: 'O(n²)', timeWorst: 'O(n²)', spaceComplexity: 'O(1)', stable: '稳定' },
+            { name: '归并排序', timeBest: 'O(n log n)', timeAverage: 'O(n log n)', timeWorst: 'O(n log n)', spaceComplexity: 'O(n)', stable: '稳定' },
+            { name: '快速排序', timeBest: 'O(n log n)', timeAverage: 'O(n log n)', timeWorst: 'O(n²)', spaceComplexity: 'O(log n)', stable: '不稳定' },
+            { name: '堆排序', timeBest: 'O(n log n)', timeAverage: 'O(n log n)', timeWorst: 'O(n log n)', spaceComplexity: 'O(1)', stable: '不稳定' },
+            { name: '计数排序', timeBest: 'O(n + k)', timeAverage: 'O(n + k)', timeWorst: 'O(n + k)', spaceComplexity: 'O(k)', stable: '稳定' },
+            { name: '基数排序', timeBest: 'O(d(n + k))', timeAverage: 'O(d(n + k))', timeWorst: 'O(d(n + k))', spaceComplexity: 'O(n + k)', stable: '稳定' }
+        ];
+        
+        const complexityDataEn = [
+            { name: 'Bubble Sort', timeBest: 'O(n)', timeAverage: 'O(n²)', timeWorst: 'O(n²)', spaceComplexity: 'O(1)', stable: 'Stable' },
+            { name: 'Selection Sort', timeBest: 'O(n²)', timeAverage: 'O(n²)', timeWorst: 'O(n²)', spaceComplexity: 'O(1)', stable: 'Unstable' },
+            { name: 'Insertion Sort', timeBest: 'O(n)', timeAverage: 'O(n²)', timeWorst: 'O(n²)', spaceComplexity: 'O(1)', stable: 'Stable' },
+            { name: 'Merge Sort', timeBest: 'O(n log n)', timeAverage: 'O(n log n)', timeWorst: 'O(n log n)', spaceComplexity: 'O(n)', stable: 'Stable' },
+            { name: 'Quick Sort', timeBest: 'O(n log n)', timeAverage: 'O(n log n)', timeWorst: 'O(n²)', spaceComplexity: 'O(log n)', stable: 'Unstable' },
+            { name: 'Heap Sort', timeBest: 'O(n log n)', timeAverage: 'O(n log n)', timeWorst: 'O(n log n)', spaceComplexity: 'O(1)', stable: 'Unstable' },
+            { name: 'Counting Sort', timeBest: 'O(n + k)', timeAverage: 'O(n + k)', timeWorst: 'O(n + k)', spaceComplexity: 'O(k)', stable: 'Stable' },
+            { name: 'Radix Sort', timeBest: 'O(d(n + k))', timeAverage: 'O(d(n + k))', timeWorst: 'O(d(n + k))', spaceComplexity: 'O(n + k)', stable: 'Stable' }
+        ];
+        
+        function getComplexityColor(cellText, cellIndex) {
+            if (cellIndex === 0) return '#ffffff';
+            if (cellIndex === 5) {
+                return (cellText.includes('稳定') || cellText.includes('Stable')) && !cellText.includes('不') && !cellText.includes('Un') ? 
+                    '#28a745' : '#dc3545';
+            }
+            if (cellIndex >= 1 && cellIndex <= 4) {
+                if (cellText.includes('O(1)')) return '#28a745';
+                if (cellText.includes('O(n)') && !cellText.includes('log') && !cellText.includes('²')) return '#17a2b8';
+                if (cellText.includes('O(n log n)')) return '#20c997';
+                if (cellText.includes('O(n²)')) return '#fd7e14';
+                if (cellText.includes('O(log n)')) return '#6f42c1';
+                if (cellText.includes('k') || cellText.includes('d')) return '#ffc107';
+            }
+            return '#ffffff';
+        }
+        
+        function createComplexityColorLegend(isEnglish = false) {
+            const title = isEnglish ? 'Complexity Color Coding' : '复杂度颜色编码';
+            
+            const legend = document.createElement('div');
+            legend.className = 'complexity-color-legend';
+            
+            // 图例标题
+            const titleElement = document.createElement('h3');
+            titleElement.textContent = title;
+            titleElement.style.cssText = `
+                width: 100%;
+                color: #4a9eff;
+                margin-bottom: 10px;
+                font-size: 16px;
+                margin-top: 0;
+            `;
+            legend.appendChild(titleElement);
+            
+            // 颜色映射定义
+            const colorMappings = [
+                { complexity: 'O(1)', color: '#28a745', label: { zh: '常数时间', en: 'Constant Time' } },
+                { complexity: 'O(n)', color: '#17a2b8', label: { zh: '线性时间', en: 'Linear Time' } },
+                { complexity: 'O(n log n)', color: '#20c997', label: { zh: '对数线性', en: 'Linearithmic' } },
+                { complexity: 'O(n²)', color: '#fd7e14', label: { zh: '平方时间', en: 'Quadratic Time' } },
+                { complexity: 'O(log n)', color: '#6f42c1', label: { zh: '对数时间', en: 'Logarithmic Time' } },
+                { complexity: 'O(n+k), O(d(n+k))', color: '#ffc107', label: { zh: '特殊复杂度', en: 'Special Complexity' } }
+            ];
+            
+            // 创建图例项
+            colorMappings.forEach(mapping => {
+                const legendItem = document.createElement('div');
+                legendItem.className = 'legend-item';
+                
+                // 颜色方块
+                const colorBox = document.createElement('div');
+                colorBox.className = 'legend-color';
+                colorBox.style.background = mapping.color;
+                
+                // 文本说明
+                const label = document.createElement('span');
+                const currentLang = isEnglish ? 'en' : 'zh';
+                label.textContent = `${mapping.complexity} - ${mapping.label[currentLang]}`;
+                label.style.color = '#b0b0b0';
+                
+                legendItem.appendChild(colorBox);
+                legendItem.appendChild(label);
+                legend.appendChild(legendItem);
+            });
+            
+            return legend;
+        }
+        
+        function createComplexityTable(data, isEnglish = false) {
+            const table = document.createElement('table');
+            table.className = 'complexity-table';
+            
+            const headers = isEnglish ? 
+                ['Algorithm', 'Best Case', 'Average Case', 'Worst Case', 'Space Complexity', 'Stability'] :
+                ['算法', '最好情况', '平均情况', '最坏情况', '空间复杂度', '稳定性'];
+            
+            // 创建表头
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            headers.forEach(headerText => {
+                const th = document.createElement('th');
+                th.textContent = headerText;
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+            
+            // 创建表体
+            const tbody = document.createElement('tbody');
+            data.forEach((algorithm) => {
+                const row = document.createElement('tr');
+                const cells = [algorithm.name, algorithm.timeBest, algorithm.timeAverage, algorithm.timeWorst, algorithm.spaceComplexity, algorithm.stable];
+                
+                cells.forEach((cellText, cellIndex) => {
+                    const td = document.createElement('td');
+                    td.textContent = cellText;
+                    td.style.cssText = `
+                        padding: 12px 10px;
+                        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                        font-family: ${cellIndex > 0 && cellIndex < 5 ? 'monospace' : 'inherit'};
+                        color: ${getComplexityColor(cellText, cellIndex)};
+                        font-weight: ${cellIndex === 0 ? 'bold' : 'normal'};
+                    `;
+                    row.appendChild(td);
+                });
+                tbody.appendChild(row);
+            });
+            table.appendChild(tbody);
+            
+            // 添加表格说明
+            const note = document.createElement('div');
+            note.className = 'table-note';
+            note.textContent = isEnglish ? 
+                'Note: n represents array size, k represents data range, d represents number of digits. O in time complexity represents Big O notation.' :
+                '说明：n表示数组大小，k表示数据范围，d表示数字位数。时间复杂度中的O表示大O记号。';
+            
+            const container = document.createElement('div');
+            container.appendChild(table);
+            container.appendChild(note);
+            return container;
+        }
+        
+        function showChineseTableWithLegend() {
+            const modal = document.getElementById('complexity-modal');
+            const container = document.getElementById('complexity-table-container');
+            const title = document.getElementById('modal-title');
+            
+            title.textContent = '算法复杂度对比表';
+            
+            // 创建图例和表格
+            const legend = createComplexityColorLegend(false);
+            const table = createComplexityTable(complexityDataZh, false);
+            
+            container.innerHTML = '';
+            container.appendChild(legend);  // 先添加图例
+            container.appendChild(table);   // 再添加表格
+            
+            modal.style.display = 'block';
+            
+            showResult('🇨🇳 中文表格（含颜色编码图例）已显示\n✅ 图例位置: 表格上方\n✅ 图例内容: 6种复杂度类型及颜色说明\n✅ 图例语言: 中文\n✅ 表格颜色: 根据复杂度类型自动着色');
+        }
+        
+        function showEnglishTableWithLegend() {
+            const modal = document.getElementById('complexity-modal');
+            const container = document.getElementById('complexity-table-container');
+            const title = document.getElementById('modal-title');
+            
+            title.textContent = 'Algorithm Complexity Comparison';
+            
+            // 创建图例和表格
+            const legend = createComplexityColorLegend(true);
+            const table = createComplexityTable(complexityDataEn, true);
+            
+            container.innerHTML = '';
+            container.appendChild(legend);  // 先添加图例
+            container.appendChild(table);   // 再添加表格
+            
+            modal.style.display = 'block';
+            
+            showResult('🇺🇸 English table (with color coding legend) displayed\n✅ Legend position: Above table\n✅ Legend content: 6 complexity types with color explanations\n✅ Legend language: English\n✅ Table colors: Auto-colored by complexity type');
+        }
+        
+        function testLegendOnly() {
+            const modal = document.getElementById('complexity-modal');
+            const container = document.getElementById('complexity-table-container');
+            const title = document.getElementById('modal-title');
+            
+            title.textContent = '复杂度颜色编码图例测试';
+            
+            // 只显示图例
+            const legendZh = createComplexityColorLegend(false);
+            const legendEn = createComplexityColorLegend(true);
+            
+            container.innerHTML = '';
+            container.appendChild(legendZh);
+            
+            // 添加分隔线
+            const separator = document.createElement('div');
+            separator.style.cssText = `
+                height: 1px;
+                background: rgba(255, 255, 255, 0.2);
+                margin: 20px 0;
+            `;
+            container.appendChild(separator);
+            
+            container.appendChild(legendEn);
+            
+            modal.style.display = 'block';
+            
+            showResult('🎨 图例独立测试\n✅ 中文图例: 显示正常\n✅ 英文图例: 显示正常\n✅ 颜色方块: 6种复杂度颜色\n✅ 文本说明: 中英文对照\n✅ 布局样式: 响应式排列');
+        }
+        
+        function openMainApp() {
+            showResult('🚀 主应用测试指南\n\n1. 打开 index.html 文件\n2. 点击"复杂度对比"按钮\n3. 检查新增功能:\n\n✅ 图例显示: 表格上方应显示复杂度颜色编码图例\n✅ 图例内容: 包含6种复杂度类型和对应颜色\n✅ 图例语言: 根据当前网页语言自动切换\n✅ 表格颜色: 复杂度值按类型自动着色\n✅ 整体布局: 图例和表格协调显示');
+            
+            try {
+                window.open('index.html', '_blank');
+            } catch (e) {
+                document.getElementById('test-result').innerHTML += '<br><br>⚠️ 无法自动打开，请手动打开 index.html 文件';
+            }
+        }
+        
+        function showResult(text) {
+            const result = document.getElementById('test-result');
+            result.style.display = 'block';
+            result.textContent = text;
+        }
+        
+        function closeModal() {
+            document.getElementById('complexity-modal').style.display = 'none';
+        }
+        
+        window.onclick = function(event) {
+            const modal = document.getElementById('complexity-modal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

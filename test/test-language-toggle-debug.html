@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Toggle Debug Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
+            color: white;
+            padding: 20px;
+        }
+        .test-section {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+        .btn {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 10px 16px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .status {
+            background: rgba(0,255,0,0.2);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .error {
+            background: rgba(255,0,0,0.2);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Language Toggle Debug Test</h1>
+    
+    <div class="test-section">
+        <h2>Current Status</h2>
+        <div id="status-display">Loading...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test Elements</h2>
+        
+        <!-- Language Toggle Button -->
+        <button id="language-toggle" class="btn">
+            <span>🌐</span>
+            <span id="language-text">中文</span>
+        </button>
+        
+        <!-- Test Elements to Update -->
+        <div style="margin-top: 20px;">
+            <label for="algorithm-select">排序算法:</label>
+            <select id="algorithm-select">
+                <option value="bubbleSort">冒泡排序</option>
+                <option value="selectionSort">选择排序</option>
+            </select>
+        </div>
+        
+        <div style="margin-top: 10px;">
+            <button id="start-sort" class="btn">
+                <span>▶️</span>
+                <span>开始排序</span>
+            </button>
+        </div>
+        
+        <div style="margin-top: 10px;">
+            <h3 id="algorithm-info-title">算法信息</h3>
+            <p id="algorithm-description">请选择一个排序算法查看详细信息。</p>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Debug Actions</h2>
+        <button onclick="testLanguageManager()" class="btn">Test Language Manager</button>
+        <button onclick="testEventBinding()" class="btn">Test Event Binding</button>
+        <button onclick="testUpdateAllTexts()" class="btn">Test Update All Texts</button>
+        <button onclick="manualToggle()" class="btn">Manual Toggle</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Debug Log</h2>
+        <div id="debug-log" style="background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px; font-family: monospace; font-size: 12px; max-height: 300px; overflow-y: auto;"></div>
+    </div>
+
+    <script src="language-manager.js"></script>
+    <script>
+        let debugLog = [];
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            debugLog.push(`[${timestamp}] ${message}`);
+            updateDebugDisplay();
+            console.log(message);
+        }
+        
+        function updateDebugDisplay() {
+            const logElement = document.getElementById('debug-log');
+            logElement.innerHTML = debugLog.join('<br>');
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+        
+        function updateStatus() {
+            const statusElement = document.getElementById('status-display');
+            const currentLang = window.languageManager ? window.languageManager.getCurrentLanguage() : 'unknown';
+            const buttonExists = document.getElementById('language-toggle') ? 'YES' : 'NO';
+            const eventBound = window.languageManager && window.languageManager.toggleLanguageHandler ? 'YES' : 'NO';
+            
+            statusElement.innerHTML = `
+                <div><strong>Language Manager:</strong> ${window.languageManager ? 'Initialized' : 'Not Found'}</div>
+                <div><strong>Current Language:</strong> ${currentLang}</div>
+                <div><strong>Toggle Button Exists:</strong> ${buttonExists}</div>
+                <div><strong>Event Handler Bound:</strong> ${eventBound}</div>
+                <div><strong>Page Title:</strong> ${document.title}</div>
+            `;
+        }
+        
+        function testLanguageManager() {
+            log('=== Testing Language Manager ===');
+            
+            if (!window.languageManager) {
+                log('ERROR: Language manager not found');
+                return;
+            }
+            
+            log('✓ Language manager exists');
+            log(`Current language: ${window.languageManager.getCurrentLanguage()}`);
+            log(`getText test: ${window.languageManager.getText('pageTitle')}`);
+            
+            // Test translations exist
+            const zhTitle = window.languageManager.translations.zh.pageTitle;
+            const enTitle = window.languageManager.translations.en.pageTitle;
+            log(`ZH title: ${zhTitle}`);
+            log(`EN title: ${enTitle}`);
+        }
+        
+        function testEventBinding() {
+            log('=== Testing Event Binding ===');
+            
+            const button = document.getElementById('language-toggle');
+            if (!button) {
+                log('ERROR: Language toggle button not found');
+                return;
+            }
+            
+            log('✓ Language toggle button exists');
+            
+            // Check if event listeners are attached
+            const listeners = getEventListeners ? getEventListeners(button) : 'Cannot check (DevTools required)';
+            log(`Event listeners: ${JSON.stringify(listeners)}`);
+            
+            // Test manual event trigger
+            log('Attempting to trigger click event...');
+            button.click();
+        }
+        
+        function testUpdateAllTexts() {
+            log('=== Testing Update All Texts ===');
+            
+            if (!window.languageManager) {
+                log('ERROR: Language manager not found');
+                return;
+            }
+            
+            if (typeof window.languageManager.updateAllTexts !== 'function') {
+                log('ERROR: updateAllTexts method not found');
+                return;
+            }
+            
+            log('Calling updateAllTexts...');
+            try {
+                window.languageManager.updateAllTexts();
+                log('✓ updateAllTexts completed successfully');
+                updateStatus();
+            } catch (error) {
+                log(`ERROR in updateAllTexts: ${error.message}`);
+            }
+        }
+        
+        function manualToggle() {
+            log('=== Manual Language Toggle ===');
+            
+            if (!window.languageManager) {
+                log('ERROR: Language manager not found');
+                return;
+            }
+            
+            const oldLang = window.languageManager.getCurrentLanguage();
+            log(`Current language: ${oldLang}`);
+            
+            try {
+                window.languageManager.toggleLanguage();
+                const newLang = window.languageManager.getCurrentLanguage();
+                log(`New language: ${newLang}`);
+                log(`Title changed to: ${document.title}`);
+                updateStatus();
+            } catch (error) {
+                log(`ERROR in toggleLanguage: ${error.message}`);
+            }
+        }
+        
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            log('DOM Content Loaded');
+            updateStatus();
+            
+            // Listen for language change events
+            document.addEventListener('languageChanged', (event) => {
+                log(`Language changed event received: ${event.detail.language}`);
+                updateStatus();
+            });
+            
+            // Monitor button clicks
+            const button = document.getElementById('language-toggle');
+            if (button) {
+                button.addEventListener('click', () => {
+                    log('Language toggle button clicked (direct listener)');
+                });
+            }
+        });
+        
+        // Update status every 2 seconds
+        setInterval(updateStatus, 2000);
+        
+        log('Debug test page loaded');
+    </script>
+</body>
+</html>

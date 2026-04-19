@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Step Display Bug Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .test-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .control-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            border-left: 4px solid #4a9eff;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
+        }
+        
+        .btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        }
+        
+        .status-display {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .current-step {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #4a9eff;
+            margin: 10px 0;
+        }
+        
+        .test-log {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 15px 0;
+        }
+        
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        
+        .log-info {
+            color: #17a2b8;
+        }
+        
+        .log-success {
+            color: #28a745;
+        }
+        
+        .log-warning {
+            color: #ffc107;
+        }
+        
+        .log-error {
+            color: #dc3545;
+        }
+        
+        .array-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 200px;
+            justify-content: center;
+            padding: 20px 0 60px 0;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🐛 Reset Step Display Bug Test</h1>
+        <p>测试重现用户报告的问题：关闭教学模式后，点击"暂停"再点击"重置"，"当前步骤"显示"排序已完成"而不是"等待排序"。</p>
+        
+        <div class="control-section">
+            <h2>🎮 控制面板</h2>
+            
+            <div style="margin-bottom: 15px;">
+                <label>算法选择:</label>
+                <select id="algorithm-select" style="margin-left: 10px; padding: 5px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px;">
+                    <option value="bubbleSort">冒泡排序</option>
+                    <option value="selectionSort">选择排序</option>
+                    <option value="insertionSort">插入排序</option>
+                </select>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <button id="generate-array" class="btn">🎲 生成新数组</button>
+                <button id="start-sort" class="btn btn-success">▶️ 开始排序</button>
+                <button id="pause-sort" class="btn btn-warning" disabled>⏸️ 暂停</button>
+                <button id="resume-sort" class="btn btn-success hidden">▶️ 继续</button>
+                <button id="reset-sort" class="btn btn-danger">🔄 重置</button>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <button id="teaching-mode" class="btn btn-secondary">🎓 教学模式</button>
+                <span id="teaching-status" style="margin-left: 10px; color: #ffc107;">关闭</span>
+            </div>
+        </div>
+        
+        <div class="control-section">
+            <h2>📊 状态显示</h2>
+            <div class="status-display">
+                <strong>当前步骤:</strong>
+                <div id="current-step" class="current-step">
+                    准备开始排序...
+                </div>
+            </div>
+            
+            <div class="status-display">
+                <strong>按钮状态:</strong>
+                <div id="button-status">
+                    ready
+                </div>
+            </div>
+            
+            <div class="status-display">
+                <strong>排序引擎状态:</strong>
+                <div id="engine-status">
+                    stopped
+                </div>
+            </div>
+        </div>
+        
+        <div class="control-section">
+            <h2>🧪 测试步骤</h2>
+            <ol>
+                <li>点击"开始排序"开始排序</li>
+                <li>开启"教学模式"（可选）</li>
+                <li>点击"暂停"暂停排序</li>
+                <li>关闭"教学模式"（如果之前开启了）</li>
+                <li>点击"重置"</li>
+                <li>观察"当前步骤"是否正确显示"等待排序"而不是"排序已完成"</li>
+            </ol>
+            
+            <button onclick="runAutomaticTest()" class="btn" style="background: linear-gradient(135deg, #e91e63 0%, #ad1457 100%);">
+                🤖 自动测试
+            </button>
+        </div>
+        
+        <div class="control-section">
+            <h2>📝 测试日志</h2>
+            <div id="test-log" class="test-log">
+                <div class="log-entry log-info">测试日志将在这里显示...</div>
+            </div>
+        </div>
+        
+        <!-- 可视化区域 -->
+        <div class="array-container" id="array-container">
+            <!-- 柱状图将在这里动态生成 -->
+        </div>
+    </div>
+
+    <script src="language-manager.js"></script>
+    <script src="sorting-algorithms.js"></script>
+    <script src="ui-handler.js"></script>
+    <script>
+        let testLog = [];
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            testLog.push({ message: logEntry, type });
+            
+            const logContainer = document.getElementById('test-log');
+            const logDiv = document.createElement('div');
+            logDiv.className = `log-entry log-${type}`;
+            logDiv.textContent = logEntry;
+            logContainer.appendChild(logDiv);
+            
+            // 滚动到底部
+            logContainer.scrollTop = logContainer.scrollHeight;
+            
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+        
+        function updateStatus() {
+            // 更新当前步骤显示
+            const currentStepElement = document.getElementById('current-step');
+            const originalStepElement = document.getElementById('current-step');
+            if (originalStepElement) {
+                currentStepElement.textContent = originalStepElement.textContent;
+            }
+            
+            // 更新按钮状态
+            const startBtn = document.getElementById('start-sort');
+            const pauseBtn = document.getElementById('pause-sort');
+            const resumeBtn = document.getElementById('resume-sort');
+            const resetBtn = document.getElementById('reset-sort');
+            
+            let buttonState = 'unknown';
+            if (!startBtn.disabled && pauseBtn.disabled) {
+                buttonState = startBtn.textContent.includes('开始') ? 'ready' : 'completed';
+            } else if (startBtn.disabled && !pauseBtn.disabled) {
+                buttonState = 'sorting';
+            } else if (startBtn.disabled && pauseBtn.classList.contains('hidden')) {
+                buttonState = 'paused';
+            }
+            
+            document.getElementById('button-status').textContent = buttonState;
+            
+            // 更新排序引擎状态
+            let engineStatus = 'unknown';
+            if (window.uiHandler && window.uiHandler.sortingEngine) {
+                const engine = window.uiHandler.sortingEngine;
+                if (engine.isRunning) {
+                    engineStatus = engine.isPaused ? 'paused' : 'running';
+                } else {
+                    engineStatus = engine.isStopped ? 'stopped' : 'ready';
+                }
+            }
+            document.getElementById('engine-status').textContent = engineStatus;
+            
+            // 更新教学模式状态
+            const teachingStatus = window.uiHandler && window.uiHandler.teachingMode ? '开启' : '关闭';
+            document.getElementById('teaching-status').textContent = teachingStatus;
+            document.getElementById('teaching-status').style.color = teachingStatus === '开启' ? '#28a745' : '#ffc107';
+        }
+        
+        async function runAutomaticTest() {
+            log('🚀 开始自动测试重置步骤显示问题...', 'info');
+            
+            try {
+                // 步骤1: 开始排序
+                log('步骤1: 点击"开始排序"', 'info');
+                document.getElementById('start-sort').click();
+                await sleep(1000);
+                updateStatus();
+                log(`当前步骤: "${document.getElementById('current-step').textContent}"`, 'info');
+                
+                // 步骤2: 暂停排序
+                log('步骤2: 点击"暂停"', 'info');
+                document.getElementById('pause-sort').click();
+                await sleep(500);
+                updateStatus();
+                log(`当前步骤: "${document.getElementById('current-step').textContent}"`, 'info');
+                
+                // 步骤3: 重置排序
+                log('步骤3: 点击"重置"', 'warning');
+                const beforeResetStep = document.getElementById('current-step').textContent;
+                log(`重置前的步骤: "${beforeResetStep}"`, 'info');
+                
+                document.getElementById('reset-sort').click();
+                await sleep(200); // 等待重置完成
+                updateStatus();
+                
+                const afterResetStep = document.getElementById('current-step').textContent;
+                log(`重置后的步骤: "${afterResetStep}"`, 'info');
+                
+                // 检查结果
+                const expectedTexts = ['准备开始排序', '等待排序', 'Ready to start', 'Waiting'];
+                const isCorrect = expectedTexts.some(text => afterResetStep.includes(text));
+                const isIncorrect = afterResetStep.includes('完成') || afterResetStep.includes('completed');
+                
+                if (isCorrect && !isIncorrect) {
+                    log('✅ 测试通过: 重置后正确显示等待状态', 'success');
+                } else if (isIncorrect) {
+                    log('❌ 测试失败: 重置后错误显示完成状态', 'error');
+                    log('🐛 发现BUG: 这正是用户报告的问题！', 'error');
+                } else {
+                    log('⚠️ 测试结果不确定: 步骤显示异常', 'warning');
+                }
+                
+                log('🏁 自动测试完成', 'info');
+                
+            } catch (error) {
+                log(`❌ 测试过程中出现错误: ${error.message}`, 'error');
+            }
+        }
+        
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        // 等待UI初始化完成
+        setTimeout(() => {
+            if (window.uiHandler) {
+                log('✅ UI Handler 初始化完成', 'success');
+                updateStatus();
+                
+                // 监听步骤变化
+                const observer = new MutationObserver(() => {
+                    updateStatus();
+                });
+                
+                const stepElement = document.getElementById('current-step');
+                if (stepElement) {
+                    observer.observe(stepElement, { 
+                        childList: true, 
+                        subtree: true, 
+                        characterData: true 
+                    });
+                }
+                
+                // 定期更新状态
+                setInterval(updateStatus, 1000);
+                
+            } else {
+                log('❌ UI Handler 初始化失败', 'error');
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

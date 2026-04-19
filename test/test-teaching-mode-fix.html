@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教学模式修复测试</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #4a9eff 0%, #0078d4 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 10px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(74, 158, 255, 0.3);
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+        }
+        
+        .test-result {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            border-left: 4px solid #4caf50;
+            color: #4caf50;
+            display: none;
+        }
+        
+        .test-error {
+            border-left-color: #f44336;
+            color: #f44336;
+        }
+        
+        .test-warning {
+            border-left-color: #ff9800;
+            color: #ff9800;
+        }
+        
+        .mini-visualizer {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 100px;
+            justify-content: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .mini-bar {
+            width: 20px;
+            background: linear-gradient(135deg, #87ceeb 0%, #5dade2 100%);
+            border-radius: 3px 3px 0 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .mini-bar.completed {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        }
+        
+        .mini-bar.comparing {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        }
+        
+        .mini-bar.swapping {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 style="text-align: center; color: #4a9eff; margin-bottom: 30px;">🎓 教学模式修复测试</h1>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <button class="btn" onclick="testTeachingModeIssue()">🔍 测试教学模式问题</button>
+            <button class="btn btn-success" onclick="testSortingEngineLogic()">⚙️ 测试排序引擎逻辑</button>
+            <button class="btn btn-warning" onclick="simulateTeachingMode()">🎭 模拟教学模式</button>
+            <button class="btn" onclick="openMainApp()">🚀 打开主应用测试</button>
+        </div>
+        
+        <div class="mini-visualizer" id="mini-visualizer">
+            <!-- 迷你可视化器 -->
+        </div>
+        
+        <div id="test-result" class="test-result"></div>
+    </div>
+
+    <script>
+        // 模拟排序引擎的简化版本
+        class MockSortingEngine {
+            constructor() {
+                this.array = [5, 2, 8, 1, 9];
+                this.teachingMode = false;
+                this.isRunning = false;
+                this.isStopped = false;
+                this.allElementsSorted = false;
+                this.visualizer = new MockVisualizer();
+            }
+            
+            setTeachingMode(enabled) {
+                this.teachingMode = enabled;
+            }
+            
+            async sort() {
+                this.isRunning = true;
+                this.isStopped = false;
+                this.allElementsSorted = false;
+                
+                try {
+                    // 模拟冒泡排序的一轮
+                    for (let i = 0; i < this.array.length - 1; i++) {
+                        if (this.teachingMode) {
+                            // 教学模式：等待用户确认
+                            await this.teachingStep('comparing', { i, j: i + 1 });
+                        }
+                        
+                        this.visualizer.highlightComparison(i, i + 1);
+                        await this.delay(500);
+                        
+                        if (this.array[i] > this.array[i + 1]) {
+                            if (this.teachingMode) {
+                                await this.teachingStep('swapping', { i, j: i + 1 });
+                            }
+                            
+                            this.visualizer.highlightSwap(i, i + 1);
+                            [this.array[i], this.array[i + 1]] = [this.array[i + 1], this.array[i]];
+                            this.visualizer.renderArray(this.array);
+                            await this.delay(500);
+                        }
+                        
+                        this.visualizer.clearHighlights();
+                    }
+                    
+                    // 标记最后一个元素为已排序
+                    this.visualizer.markAsSorted([this.array.length - 1]);
+                    
+                } finally {
+                    this.isRunning = false;
+                    
+                    // 这里是问题所在：在教学模式下不应该立即标记所有元素为已排序
+                    if (!this.isStopped && !this.allElementsSorted && !this.teachingMode) {
+                        // 只在非教学模式下才自动标记所有元素为已排序
+                        const allIndices = Array.from({ length: this.array.length }, (_, i) => i);
+                        this.visualizer.markAsSorted(allIndices);
+                        this.allElementsSorted = true;
+                    }
+                }
+            }
+            
+            async teachingStep(stepType, params) {
+                return new Promise(resolve => {
+                    const message = `教学步骤: ${stepType} - 位置 ${params.i} 和 ${params.j}`;
+                    showResult(`🎓 ${message}\n点击"继续"按钮继续下一步...`, 'warning');
+                    
+                    // 模拟用户点击继续
+                    setTimeout(() => {
+                        resolve(true);
+                    }, 1000);
+                });
+            }
+            
+            async delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+        
+        class MockVisualizer {
+            constructor() {
+                this.sortedIndices = new Set();
+                this.container = document.getElementById('mini-visualizer');
+            }
+            
+            renderArray(array) {
+                this.container.innerHTML = '';
+                array.forEach((value, index) => {
+                    const bar = document.createElement('div');
+                    bar.className = 'mini-bar';
+                    bar.style.height = `${value * 10}px`;
+                    bar.textContent = value;
+                    bar.style.color = '#fff';
+                    bar.style.fontSize = '12px';
+                    bar.style.display = 'flex';
+                    bar.style.alignItems = 'center';
+                    bar.style.justifyContent = 'center';
+                    
+                    if (this.sortedIndices.has(index)) {
+                        bar.classList.add('completed');
+                    }
+                    
+                    this.container.appendChild(bar);
+                });
+            }
+            
+            highlightComparison(i, j) {
+                const bars = this.container.children;
+                if (bars[i]) bars[i].classList.add('comparing');
+                if (bars[j]) bars[j].classList.add('comparing');
+            }
+            
+            highlightSwap(i, j) {
+                const bars = this.container.children;
+                if (bars[i]) {
+                    bars[i].classList.remove('comparing');
+                    bars[i].classList.add('swapping');
+                }
+                if (bars[j]) {
+                    bars[j].classList.remove('comparing');
+                    bars[j].classList.add('swapping');
+                }
+            }
+            
+            clearHighlights() {
+                const bars = this.container.children;
+                for (let bar of bars) {
+                    bar.classList.remove('comparing', 'swapping');
+                }
+            }
+            
+            markAsSorted(indices) {
+                const bars = this.container.children;
+                indices.forEach(index => {
+                    if (bars[index]) {
+                        bars[index].classList.add('completed');
+                        this.sortedIndices.add(index);
+                    }
+                });
+            }
+        }
+        
+        let mockEngine = new MockSortingEngine();
+        
+        function testTeachingModeIssue() {
+            showResult('🔍 测试教学模式问题\n\n问题描述:\n- 教学模式开启后柱状图一瞬间全变绿色\n- 没有进行逐步排序过程\n\n可能原因:\n1. sort()方法的finally块强制标记所有元素为已排序\n2. 教学模式的等待机制被跳过\n3. 可视化器状态管理问题\n\n修复方案:\n- 在finally块中添加teachingMode检查\n- 确保教学模式下不会自动标记所有元素为已排序', 'warning');
+        }
+        
+        async function testSortingEngineLogic() {
+            showResult('⚙️ 开始测试排序引擎逻辑...', 'success');
+            
+            // 重置引擎
+            mockEngine = new MockSortingEngine();
+            mockEngine.visualizer.renderArray(mockEngine.array);
+            
+            // 测试非教学模式
+            showResult('📝 测试非教学模式:\n- 应该正常排序并在最后标记所有元素为绿色', 'success');
+            mockEngine.setTeachingMode(false);
+            await mockEngine.sort();
+            
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // 重置并测试教学模式
+            mockEngine = new MockSortingEngine();
+            mockEngine.visualizer.renderArray(mockEngine.array);
+            
+            showResult('🎓 测试教学模式:\n- 应该逐步排序，不会立即全变绿色\n- 每步都有教学提示', 'warning');
+            mockEngine.setTeachingMode(true);
+            await mockEngine.sort();
+            
+            showResult('✅ 测试完成!\n\n观察结果:\n- 非教学模式: 快速排序，最后全变绿色\n- 教学模式: 逐步排序，有教学提示，不会立即全变绿色', 'success');
+        }
+        
+        async function simulateTeachingMode() {
+            showResult('🎭 模拟教学模式运行...', 'warning');
+            
+            mockEngine = new MockSortingEngine();
+            mockEngine.setTeachingMode(true);
+            mockEngine.visualizer.renderArray(mockEngine.array);
+            
+            // 手动模拟教学步骤
+            const steps = [
+                { type: 'compare', i: 0, j: 1, message: '比较位置0和1的元素' },
+                { type: 'swap', i: 0, j: 1, message: '交换位置0和1的元素' },
+                { type: 'compare', i: 1, j: 2, message: '比较位置1和2的元素' },
+                { type: 'compare', i: 2, j: 3, message: '比较位置2和3的元素' },
+                { type: 'swap', i: 2, j: 3, message: '交换位置2和3的元素' }
+            ];
+            
+            for (let step of steps) {
+                showResult(`🎓 教学步骤: ${step.message}\n等待1秒后继续...`, 'warning');
+                
+                if (step.type === 'compare') {
+                    mockEngine.visualizer.highlightComparison(step.i, step.j);
+                } else if (step.type === 'swap') {
+                    mockEngine.visualizer.highlightSwap(step.i, step.j);
+                    [mockEngine.array[step.i], mockEngine.array[step.j]] = [mockEngine.array[step.j], mockEngine.array[step.i]];
+                    mockEngine.visualizer.renderArray(mockEngine.array);
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                mockEngine.visualizer.clearHighlights();
+            }
+            
+            showResult('✅ 教学模式模拟完成!\n\n关键点:\n- 每步都有明确的提示\n- 不会立即全变绿色\n- 用户可以控制进度', 'success');
+        }
+        
+        function openMainApp() {
+            showResult('🚀 主应用测试指南\n\n修复验证步骤:\n1. 打开 index.html\n2. 点击"教学模式"按钮开启教学模式\n3. 点击"开始排序"按钮\n4. 检查是否出现以下问题:\n\n❌ 问题现象:\n- 柱状图一瞬间全变绿色\n- 没有逐步排序过程\n- 没有教学提示弹窗\n\n✅ 修复后应该:\n- 逐步显示排序过程\n- 每步都有教学提示弹窗\n- 用户点击"继续"才进行下一步\n- 不会立即全变绿色', 'success');
+            
+            try {
+                window.open('index.html', '_blank');
+            } catch (e) {
+                document.getElementById('test-result').innerHTML += '<br><br>⚠️ 无法自动打开，请手动打开 index.html 文件';
+            }
+        }
+        
+        function showResult(text, type = 'success') {
+            const result = document.getElementById('test-result');
+            result.style.display = 'block';
+            result.textContent = text;
+            result.className = `test-result ${type === 'error' ? 'test-error' : type === 'warning' ? 'test-warning' : ''}`;
+        }
+        
+        // 初始化显示
+        mockEngine.visualizer.renderArray(mockEngine.array);
+        showResult('🎓 教学模式修复测试已准备就绪\n\n点击上方按钮开始测试各种场景', 'success');
+    </script>
+</body>
+</html>
